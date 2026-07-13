@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,500&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Libre+Barcode+39+Text&display=swap" rel="stylesheet">
     
-    <!-- Supabase & LocalForage (Chống tràn bộ nhớ cực mạnh) -->
+    <!-- Supabase & LocalForage -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
@@ -99,6 +99,8 @@
         
         .wood-box { background: rgba(10,10,12,0.95); border: 2px solid #222; border-radius: 4px; padding: 24px 28px; box-shadow: 6px 6px 0 rgba(0,0,0,1); margin-bottom: 24px; position: relative; }
         .vintage-gold-title { font-family: var(--font-heading); font-size: 22px; font-weight: 900; letter-spacing: 2px; color: var(--amber); border-bottom: 2px dashed #333; padding-bottom: 12px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 2px 2px 0 #000, 0 0 10px var(--amber-glow); }
+        
+        /* QUYỀN ADMIN HIỂN THỊ */
         .admin-only-flex { display: none !important; }
         body.admin-active .admin-only-flex { display: flex !important; }
         .admin-only-btn { display: none; align-items: center; justify-content: center; gap: 6px; font-family: var(--font-kicker); font-size: 12px; padding: 10px 18px; border-radius: 2px; background: #000; color: var(--amber); border: 2px solid var(--amber); cursor: pointer; font-weight: 900; transition: 0.2s; margin-bottom: 20px; text-transform: uppercase; box-shadow: 3px 3px 0 rgba(0,0,0,1);}
@@ -454,6 +456,7 @@
                 <div class="wood-box">
                     <h2 class="embossed-title vintage-gold-title">GIỚI THIỆU</h2>
                     <div class="admin-only-flex" style="gap:10px; margin-bottom:15px; justify-content:flex-end;">
+                        <button class="submit-btn" style="width:auto; padding: 8px 15px; border-color:var(--amber); color:var(--amber); background:transparent;" onclick="openAdminForm('ai_settings')">⚙️ CÀI ĐẶT AI & GIẢI TRÍ</button>
                         <button class="submit-btn" style="width:auto; padding: 8px 15px;" onclick="openAdminForm('sm')">✏️ SỬA THÔNG TIN TRƯỞNG GA</button>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:24px;">
@@ -597,7 +600,7 @@
 
                         <div class="mail-paper">
                             <textarea id="mailBody" class="mail-textarea" placeholder="Viết tâm thư của bạn vào đây..."></textarea>
-                            <div class="mail-loader" id="mailLoader">⏳</div>
+                            <div class="mail-loader" id="mailLoader">⏳ AI đang viết thư...</div>
                             <div class="mail-reply-box" id="mailReply"></div>
                         </div>
                         
@@ -617,7 +620,7 @@
                             <button class="astro-btn" onclick="playAstrolabe('card')">RÚT BÀI ĐỊNH MỆNH 🌌</button>
                         </div>
                         
-                        <div id="astroLottie" style="font-size: 60px; display:none;">✨⏳✨</div>
+                        <div id="astroLottie" style="font-size: 40px; display:none; color:var(--amber); font-weight:bold; font-family:var(--font-kicker);">⏳ Đang kết nối vũ trụ...</div>
 
                         <div class="astro-result-box" id="astroResult">
                             <div class="astro-msg" id="astroMsgText"></div>
@@ -651,7 +654,6 @@
                 Đang phát:<br><span id="gramoTitle" style="color:var(--amber);">Chưa có</span>
             </div>
         </div>
-        <!-- MÀN HÌNH DANH SÁCH PLAYLIST -->
         <div id="gramoViewPlaylists" class="gramo-scroll-area">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
                 <span style="font-size:11px; font-weight:bold; color:var(--silver); text-transform:uppercase;">Danh sách Playlist</span>
@@ -659,7 +661,6 @@
             </div>
             <div id="gramoPlaylistContainer"></div>
         </div>
-        <!-- MÀN HÌNH DANH SÁCH BÀI HÁT (ẨN MẶC ĐỊNH) -->
         <div id="gramoViewSongs" class="gramo-scroll-area" style="display:none;">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
                 <button class="g-back-btn" id="btnBackToPL">🔙 Quay lại Danh sách</button>
@@ -668,8 +669,6 @@
             <div id="currentPlNameDisplay" style="font-size:11px; color:var(--amber); margin-bottom:10px; font-weight:bold; text-transform:uppercase;"></div>
             <div id="gramoSongList"></div>
         </div>
-        
-        <!-- THANH SEEKBAR MỚI THÊM -->
         <div class="gramo-progress-container">
             <span id="currTime">0:00</span>
             <input type="range" id="seekSlider" class="seek-slider" value="0" min="0" max="100" step="1">
@@ -718,82 +717,43 @@
             bell: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>'
         };
         function loadIcons() { document.querySelectorAll(".icon-slot").forEach(el => { el.innerHTML = ICONS[el.dataset.icon]||""; }); }
-        function createEmbers() {
-            const container = document.getElementById('emberContainer');
-            for(let i=0; i<30; i++) { let ember = document.createElement('div'); ember.className = 'ember'; ember.style.left = Math.random() * 100 + 'vw'; ember.style.top = (Math.random() * 50 + 50) + 'vh'; ember.style.animationDelay = Math.random() * 5 + 's'; ember.style.animationDuration = (Math.random() * 2 + 3) + 's'; container.appendChild(ember); }
-        }
-        function createFireflies() {
-            const container = document.getElementById('bg-page2');
-            for(let i=0; i<60; i++) {
-                let ff = document.createElement('div'); ff.className = 'firefly';
-                ff.style.left = Math.random() * 100 + 'vw'; ff.style.top = Math.random() * 100 + 'vh';
-                ff.style.animationDelay = (Math.random() * 5) + 's'; ff.style.animationDuration = (Math.random() * 2 + 2) + 's, ' + (Math.random() * 10 + 15) + 's';
-                container.appendChild(ff);
-            }
-        }
-        function burstParticles(e) {
-            const container = document.getElementById('bg-page2');
-            const rect = e.target.getBoundingClientRect();
-            const x = rect.left + rect.width / 2; const y = rect.top + rect.height / 2;
-            for(let i=0; i<15; i++) {
-                let p = document.createElement('div'); p.className = 'magic-particle';
-                p.style.left = (x + (Math.random() - 0.5) * 80) + 'px'; p.style.top = (y + (Math.random() - 0.5) * 80) + 'px';
-                let size = Math.random() * 4 + 2; p.style.width = size + 'px'; p.style.height = size + 'px'; p.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
-                container.appendChild(p); setTimeout(() => p.remove(), 3000);
-            }
-        }
+        function createEmbers() { const container = document.getElementById('emberContainer'); for(let i=0; i<30; i++) { let ember = document.createElement('div'); ember.className = 'ember'; ember.style.left = Math.random() * 100 + 'vw'; ember.style.top = (Math.random() * 50 + 50) + 'vh'; ember.style.animationDelay = Math.random() * 5 + 's'; ember.style.animationDuration = (Math.random() * 2 + 3) + 's'; container.appendChild(ember); } }
+        function createFireflies() { const container = document.getElementById('bg-page2'); for(let i=0; i<60; i++) { let ff = document.createElement('div'); ff.className = 'firefly'; ff.style.left = Math.random() * 100 + 'vw'; ff.style.top = Math.random() * 100 + 'vh'; ff.style.animationDelay = (Math.random() * 5) + 's'; ff.style.animationDuration = (Math.random() * 2 + 2) + 's, ' + (Math.random() * 10 + 15) + 's'; container.appendChild(ff); } }
+        function burstParticles(e) { const container = document.getElementById('bg-page2'); const rect = e.target.getBoundingClientRect(); const x = rect.left + rect.width / 2; const y = rect.top + rect.height / 2; for(let i=0; i<15; i++) { let p = document.createElement('div'); p.className = 'magic-particle'; p.style.left = (x + (Math.random() - 0.5) * 80) + 'px'; p.style.top = (y + (Math.random() - 0.5) * 80) + 'px'; let size = Math.random() * 4 + 2; p.style.width = size + 'px'; p.style.height = size + 'px'; p.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's'; container.appendChild(p); setTimeout(() => p.remove(), 3000); } }
         let noteInterval;
-        function spawnNote() {
-            if(!isPlaying) return;
-            const gramo = document.getElementById("gramoToggle");
-            const rect = gramo.getBoundingClientRect();
-            const note = document.createElement("div");
-            note.className = "floating-note icon-slot";
-            const icons = ['note1', 'note2'];
-            note.dataset.icon = icons[Math.floor(Math.random() * icons.length)];
-            note.style.setProperty('--x', (Math.random() * 2 - 1));
-            note.style.left = (rect.left + rect.width / 2 - 10) + "px";
-            note.style.top = (rect.top) + "px";
-            document.body.appendChild(note);
-            loadIcons();
-            setTimeout(() => note.remove(), 2500);
-        }
-        window.openLightbox = function(src, e) {
-            if(e) e.stopPropagation();
-            document.getElementById("lightboxImg").src = src;
-            document.getElementById("imageLightbox").classList.remove("hidden");
-        };
+        function spawnNote() { if(!isPlaying) return; const gramo = document.getElementById("gramoToggle"); const rect = gramo.getBoundingClientRect(); const note = document.createElement("div"); note.className = "floating-note icon-slot"; const icons = ['note1', 'note2']; note.dataset.icon = icons[Math.floor(Math.random() * icons.length)]; note.style.setProperty('--x', (Math.random() * 2 - 1)); note.style.left = (rect.left + rect.width / 2 - 10) + "px"; note.style.top = (rect.top) + "px"; document.body.appendChild(note); loadIcons(); setTimeout(() => note.remove(), 2500); }
+        window.openLightbox = function(src, e) { if(e) e.stopPropagation(); document.getElementById("lightboxImg").src = src; document.getElementById("imageLightbox").classList.remove("hidden"); };
+        
         const SUPABASE_URL = "https://gmejjxvahnqqrhihahid.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZWpqeHZhaG5xcXJoaWhhaGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NTM5OTQsImV4cCI6MjA5OTMyOTk5NH0.Q1uit-9R_Lrs0uM_Azgbn9GGKMoyFl-cFfl3M7IeSMU";
         const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const ADMIN_CAT_AVATAR = "ChatGPT_Image_02_56_58_7_thg_7__2026-removebg-preview-removebg-preview.png";
         const VERIFIED_TICK = `<svg style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-left:4px;" viewBox="0 0 24 24" fill="#0866FF"><circle cx="12" cy="12" r="10"/><path d="M16.5 8.5l-6 6-3-3" stroke="#fff" stroke-width="2" fill="none"/></svg>`;
         
-        let CONFIG = { stationMaster: { avatar: "", name: "Trưởng Ga", bio: "Chào mừng đến với nhà ga Meown.", facebook: {} }, trains: [], staff: [], upcomingBots: [], musicLibrary: [], lastUpdated: 0, musicLastUpdated: 0 };
-        let isAdminMode = false; let activeMusicPl = null;
-        let localGuestbook = []; let localRecruit = [];
-        let currentSearch = ""; 
+        // CONFIG BỔ SUNG THÊM AI SETTINGS
+        let CONFIG = { 
+            stationMaster: { avatar: "", name: "Trưởng Ga", bio: "Chào mừng đến với nhà ga Meown.", facebook: {} }, 
+            trains: [], staff: [], upcomingBots: [], musicLibrary: [], lastUpdated: 0, musicLastUpdated: 0,
+            aiSettings: {
+                apiKey: "",
+                promptBamboo: "Bạn là quầy gieo xăm tre tại ga Meown cổ kính. Hãy viết 2-3 câu chúc phúc tĩnh tâm, dùng từ Hán Việt nhã nhặn, triết lý thiền định.",
+                promptCard: "Bạn là thẻ bài định mệnh tại ga Meown. Hãy viết 2-3 câu chữa lành, dùng ngôn ngữ vũ trụ, tinh tú, trực giác, năng lượng."
+            }
+        };
+        let isAdminMode = false; let activeMusicPl = null; let localGuestbook = []; let localRecruit = []; let currentSearch = ""; 
         let userMeownCoins = parseInt(localStorage.getItem('meown_coins') || '0');
 
         function removeAccents(str) { return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : ''; }
         function resizeImage(file, maxSize = 800) { return new Promise((resolve) => { const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; if(w > maxSize || h > maxSize) { if(w > h) { h = Math.round((h * maxSize) / w); w = maxSize; } else { w = Math.round((w * maxSize) / h); h = maxSize; } } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; img.src = e.target.result; }; reader.readAsDataURL(file); }); }
         function fileToBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); }
         function rollNumber(el, target){ 
-            if(!el) return;
-            const chars = "0123456789"; let iteration = 0; const startStr = "0".repeat(target.toString().length);
+            if(!el) return; const chars = "0123456789"; let iteration = 0; const startStr = "0".repeat(target.toString().length);
             let interval = setInterval(() => {
-                el.innerText = startStr.split("").map((letter, index) => {
-                    if(index < iteration) return target.toString()[index];
-                    return chars[Math.floor(Math.random() * 10)];
-                }).join("");
-                if(iteration >= target.toString().length) { clearInterval(interval); el.innerText = target; }
-                iteration += 1/5;
+                el.innerText = startStr.split("").map((letter, index) => { if(index < iteration) return target.toString()[index]; return chars[Math.floor(Math.random() * 10)]; }).join("");
+                if(iteration >= target.toString().length) { clearInterval(interval); el.innerText = target; } iteration += 1/5;
             }, 30);
         }
-        function updateCoinDisplay() {
-            document.getElementById("dispCoinVal").textContent = userMeownCoins;
-            localStorage.setItem('meown_coins', userMeownCoins);
-        }
+        function updateCoinDisplay() { document.getElementById("dispCoinVal").textContent = userMeownCoins; localStorage.setItem('meown_coins', userMeownCoins); }
 
         function checkAdminLogin() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -807,190 +767,99 @@
             }
         }
         document.getElementById('secretAdminTrigger').addEventListener('dblclick', () => {
-            if (!localStorage.getItem('isAdmin')) {
-                let pwd = prompt("LỐI VÀO CỦA TRƯỞNG GA\nVui lòng nhập mật mã bảo mật:");
-                if(pwd === "bhnt2006") { localStorage.setItem('isAdmin', 'true'); alert("Đã cấp quyền Tối thượng cho Trưởng ga Meown!"); window.location.reload(); } else if (pwd !== null) { alert("Mật mã không chính xác!"); }
-            } else {
-                if(confirm("Bạn đang ở chế độ Admin. Bạn có muốn thoát quyền không?")) { localStorage.removeItem('isAdmin'); window.location.reload(); }
-            }
+            if (!localStorage.getItem('isAdmin')) { let pwd = prompt("LỐI VÀO CỦA TRƯỞNG GA\nVui lòng nhập mật mã bảo mật:"); if(pwd === "bhnt2006") { localStorage.setItem('isAdmin', 'true'); alert("Đã cấp quyền Tối thượng cho Trưởng ga Meown!"); window.location.reload(); } else if (pwd !== null) { alert("Mật mã không chính xác!"); } } else { if(confirm("Bạn đang ở chế độ Admin. Bạn có muốn thoát quyền không?")) { localStorage.removeItem('isAdmin'); window.location.reload(); } }
         });
         document.addEventListener("DOMContentLoaded", async () => {
-            localforage.config({ name: 'MeownStation' }); 
-            loadIcons(); createEmbers(); createFireflies();
-            checkAdminLogin(); 
+            localforage.config({ name: 'MeownStation' }); loadIcons(); createEmbers(); createFireflies(); checkAdminLogin(); 
             await fetchStationConfig();
             
             let currentVisits = parseInt(localStorage.getItem('meown_real_visits') || '0');
-            if (!sessionStorage.getItem('has_visited')) {
-                currentVisits++;
-                localStorage.setItem('meown_real_visits', currentVisits);
-                sessionStorage.setItem('has_visited', 'true');
-            }
-            const staffSearchEl = document.getElementById("staffSearch");
-            if (staffSearchEl) { staffSearchEl.addEventListener("input", (e) => { currentSearch = e.target.value; renderTrains(); }); }
-            const staffSortSelect = document.getElementById("staffSortSelect");
-            if (staffSortSelect) { staffSortSelect.addEventListener("change", () => { renderTrains(); }); }
-            
+            if (!sessionStorage.getItem('has_visited')) { currentVisits++; localStorage.setItem('meown_real_visits', currentVisits); sessionStorage.setItem('has_visited', 'true'); }
+            const staffSearchEl = document.getElementById("staffSearch"); if (staffSearchEl) { staffSearchEl.addEventListener("input", (e) => { currentSearch = e.target.value; renderTrains(); }); }
+            const staffSortSelect = document.getElementById("staffSortSelect"); if (staffSortSelect) { staffSortSelect.addEventListener("change", () => { renderTrains(); }); }
             document.getElementById("notiBtn").addEventListener("click", () => { document.getElementById("notiPanel").classList.toggle("show"); });
             updateStationMasterUI(); renderTrains(); renderUpcomingBots(); renderGramoPlaylists();
-            rollNumber(document.getElementById("statStaff"), CONFIG.staff.length || 0); 
-            rollNumber(document.getElementById("statVisits"), currentVisits); 
-            updateCoinDisplay();
+            rollNumber(document.getElementById("statStaff"), CONFIG.staff.length || 0); rollNumber(document.getElementById("statVisits"), currentVisits); updateCoinDisplay();
             
-            await fetchFeeds(); 
-            updateNotifications();
+            await fetchFeeds(); updateNotifications();
         });
         
         window.gotoNoti = function(type, id) {
-            document.getElementById("notiPanel").classList.remove("show");
-            document.getElementById("notiBadge").style.display = "none";
-            
-            if(isAdminMode) localStorage.setItem("admin_last_read", Date.now());
-            else localStorage.setItem("user_last_read_noti", Date.now());
-            
-            document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-            document.querySelectorAll(".section-view").forEach(v => v.classList.add("hidden"));
-            if(type === 'guestbook') {
-                document.querySelector('.nav-item[data-view="guestbook"]').classList.add("active"); document.getElementById("view-guestbook").classList.remove("hidden"); window.scrollTo({top: 0, behavior: 'smooth'});
-            } else if(type === 'recruit') {
-                document.querySelector('.nav-item[data-view="recruitment"]').classList.add("active"); document.getElementById("view-recruitment").classList.remove("hidden"); window.scrollTo({top: 0, behavior: 'smooth'});
-            } else if(type === 'staff') {
-                document.querySelector('.nav-item[data-view="trains"]').classList.add("active"); document.getElementById("view-trains").classList.remove("hidden");
-                setTimeout(() => {
-                    const card = document.getElementById('staff_card_' + id);
-                    if(card) {
-                        const acc = card.closest('.train-accordion');
-                        if(acc && !acc.classList.contains('open')) acc.classList.add('open');
-                        card.scrollIntoView({behavior: 'smooth', block: 'center'});
-                        card.querySelector('.staff-card-inner').style.boxShadow = "0 0 30px var(--amber)";
-                        setTimeout(() => card.querySelector('.staff-card-inner').style.boxShadow = "6px 6px 0 rgba(0,0,0,1)", 3000);
-                    }
-                }, 300);
-            }
+            document.getElementById("notiPanel").classList.remove("show"); document.getElementById("notiBadge").style.display = "none";
+            if(isAdminMode) localStorage.setItem("admin_last_read", Date.now()); else localStorage.setItem("user_last_read_noti", Date.now());
+            document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active")); document.querySelectorAll(".section-view").forEach(v => v.classList.add("hidden"));
+            if(type === 'guestbook') { document.querySelector('.nav-item[data-view="guestbook"]').classList.add("active"); document.getElementById("view-guestbook").classList.remove("hidden"); window.scrollTo({top: 0, behavior: 'smooth'}); } 
+            else if(type === 'recruit') { document.querySelector('.nav-item[data-view="recruitment"]').classList.add("active"); document.getElementById("view-recruitment").classList.remove("hidden"); window.scrollTo({top: 0, behavior: 'smooth'}); } 
+            else if(type === 'staff') { document.querySelector('.nav-item[data-view="trains"]').classList.add("active"); document.getElementById("view-trains").classList.remove("hidden"); setTimeout(() => { const card = document.getElementById('staff_card_' + id); if(card) { const acc = card.closest('.train-accordion'); if(acc && !acc.classList.contains('open')) acc.classList.add('open'); card.scrollIntoView({behavior: 'smooth', block: 'center'}); card.querySelector('.staff-card-inner').style.boxShadow = "0 0 30px var(--amber)"; setTimeout(() => card.querySelector('.staff-card-inner').style.boxShadow = "6px 6px 0 rgba(0,0,0,1)", 3000); } }, 300); }
         }
         
         function updateNotifications() {
-            const panel = document.getElementById("notiList");
-            const badge = document.getElementById("notiBadge");
-            panel.innerHTML = ""; let notiCount = 0; let html = "";
+            const panel = document.getElementById("notiList"); const badge = document.getElementById("notiBadge"); panel.innerHTML = ""; let notiCount = 0; let html = "";
             if (isAdminMode) {
                 let lastRead = parseInt(localStorage.getItem("admin_last_read") || "0");
-                CONFIG.staff.forEach(st => {
-                    (st.feedbacks || []).forEach(fb => {
-                        if (fb.date && fb.date > lastRead) { notiCount++; html += `<div class="noti-item" onclick="gotoNoti('staff', '${st.id}')">Khách <b>${fb.name}</b> vừa gửi feedback cho <span class="highlight">${st.name}</span>.</div>`; }
-                    });
-                });
-                localGuestbook.forEach(post => {
-                    let pTime = new Date(post.created_at || post.date).getTime();
-                    if (pTime && pTime > lastRead) { notiCount++; html += `<div class="noti-item" onclick="gotoNoti('guestbook')"><b>${post.name || post.author}</b> vừa viết vào <span class="highlight">Sổ lưu bút</span>.</div>`; }
-                });
-                localRecruit.forEach(post => {
-                    let pTime = new Date(post.created_at || post.date).getTime();
-                    if (pTime && pTime > lastRead) { notiCount++; html += `<div class="noti-item" onclick="gotoNoti('recruit')"><b>${post.name || post.author}</b> vừa gửi ý tưởng <span class="highlight">Tuyển dụng</span>.</div>`; }
-                });
+                CONFIG.staff.forEach(st => { (st.feedbacks || []).forEach(fb => { if (fb.date && fb.date > lastRead) { notiCount++; html += `<div class="noti-item" onclick="gotoNoti('staff', '${st.id}')">Khách <b>${fb.name}</b> vừa gửi feedback cho <span class="highlight">${st.name}</span>.</div>`; } }); });
+                localGuestbook.forEach(post => { let pTime = new Date(post.created_at || post.date).getTime(); if (pTime && pTime > lastRead) { notiCount++; html += `<div class="noti-item" onclick="gotoNoti('guestbook')"><b>${post.name || post.author}</b> vừa viết vào <span class="highlight">Sổ lưu bút</span>.</div>`; } });
+                localRecruit.forEach(post => { let pTime = new Date(post.created_at || post.date).getTime(); if (pTime && pTime > lastRead) { notiCount++; html += `<div class="noti-item" onclick="gotoNoti('recruit')"><b>${post.name || post.author}</b> vừa gửi ý tưởng <span class="highlight">Tuyển dụng</span>.</div>`; } });
             } else {
                 let userLastRead = parseInt(localStorage.getItem("user_last_read_noti") || "0");
                 let sortedStaff = [...CONFIG.staff].filter(s => !s.isHidden).sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
                 let top2 = sortedStaff.slice(0, 2);
-                top2.forEach(st => {
-                    if ((st.createdAt || 0) > userLastRead) { notiCount++; }
-                    html += `<div class="noti-item" onclick="gotoNoti('staff', '${st.id}')">Chào mừng nhân viên mới: <span class="highlight">${st.name}</span> vừa ra mắt! Xem ngay >></div>`;
-                });
+                top2.forEach(st => { if ((st.createdAt || 0) > userLastRead) { notiCount++; } html += `<div class="noti-item" onclick="gotoNoti('staff', '${st.id}')">Chào mừng nhân viên mới: <span class="highlight">${st.name}</span> vừa ra mắt! Xem ngay >></div>`; });
             }
             if (html === "") { html = `<div class="noti-item" style="color:var(--silver); font-style:italic;">Chưa có thông báo mới nào.</div>`; }
-            panel.innerHTML = html;
-            if (notiCount > 0) { badge.textContent = notiCount > 9 ? "9+" : notiCount; badge.style.display = "flex"; } else { badge.style.display = "none"; }
+            panel.innerHTML = html; if (notiCount > 0) { badge.textContent = notiCount > 9 ? "9+" : notiCount; badge.style.display = "flex"; } else { badge.style.display = "none"; }
         }
         
         async function fetchStationConfig() {
             try {
                 const { data: mainData } = await supa.from('station_config').select('data').eq('id', 1).single();
-                let dbConfig = {};
-                if (mainData && mainData.data) { dbConfig = typeof mainData.data === 'string' ? JSON.parse(mainData.data) : mainData.data; }
-                let dbMusic = [];
-                const { data: musicData } = await supa.from('station_config').select('data').eq('id', 2).single();
+                let dbConfig = {}; if (mainData && mainData.data) { dbConfig = typeof mainData.data === 'string' ? JSON.parse(mainData.data) : mainData.data; }
+                let dbMusic = []; const { data: musicData } = await supa.from('station_config').select('data').eq('id', 2).single();
                 if (musicData && musicData.data) { dbMusic = typeof musicData.data === 'string' ? JSON.parse(musicData.data) : musicData.data; } else if (dbConfig.musicLibrary) { dbMusic = dbConfig.musicLibrary; }
-                let localMain = await localforage.getItem("meown_config_backup") || {};
-                let localMusic = await localforage.getItem("meown_music_backup");
-                let dbTime = dbConfig.lastUpdated || 0;
-                let localTime = localMain.lastUpdated || 0;
+                let localMain = await localforage.getItem("meown_config_backup") || {}; let localMusic = await localforage.getItem("meown_music_backup");
+                let dbTime = dbConfig.lastUpdated || 0; let localTime = localMain.lastUpdated || 0;
                 if (localTime > dbTime) { CONFIG = { ...CONFIG, ...localMain }; } else { CONFIG = { ...CONFIG, ...dbConfig }; }
-                let dbSongCount = 0;
-                if(dbMusic && Array.isArray(dbMusic)) dbMusic.forEach(pl => dbSongCount += (pl.songs ? pl.songs.length : 0));
-                let localSongCount = 0;
-                if(localMusic && Array.isArray(localMusic)) localMusic.forEach(pl => localSongCount += (pl.songs ? pl.songs.length : 0));
-                let dbMusicTime = dbConfig.musicLastUpdated || 0;
-                let localMusicTime = localMain.musicLastUpdated || 0;
+                if(!CONFIG.aiSettings) { CONFIG.aiSettings = { apiKey: "", promptBamboo: "Bạn là quầy gieo xăm tre tại ga Meown cổ kính. Hãy viết 2-3 câu chúc phúc tĩnh tâm, dùng từ Hán Việt nhã nhặn, triết lý thiền định.", promptCard: "Bạn là thẻ bài định mệnh tại ga Meown. Hãy viết 2-3 câu chữa lành, dùng ngôn ngữ vũ trụ, tinh tú, trực giác, năng lượng." }; }
+                
+                let dbSongCount = 0; if(dbMusic && Array.isArray(dbMusic)) dbMusic.forEach(pl => dbSongCount += (pl.songs ? pl.songs.length : 0));
+                let localSongCount = 0; if(localMusic && Array.isArray(localMusic)) localMusic.forEach(pl => localSongCount += (pl.songs ? pl.songs.length : 0));
+                let dbMusicTime = dbConfig.musicLastUpdated || 0; let localMusicTime = localMain.musicLastUpdated || 0;
                 if (localMusic && Array.isArray(localMusic) && (localMusicTime > dbMusicTime || localSongCount > dbSongCount || localMusic.length > dbMusic.length)) { CONFIG.musicLibrary = localMusic; } else { CONFIG.musicLibrary = dbMusic || []; }
                 if(!CONFIG.musicLibrary || !Array.isArray(CONFIG.musicLibrary)) CONFIG.musicLibrary = [];
             } catch(e) { console.warn("Lỗi đồng bộ dữ liệu hệ thống:", e); }
         }
         
         async function saveStationConfigToDB(skipMusicSync = false) {
-            CONFIG.lastUpdated = Date.now(); 
-            if (!skipMusicSync) CONFIG.musicLastUpdated = Date.now();
-            if (!CONFIG.musicLibrary) CONFIG.musicLibrary = []; 
-            const mainPayload = { stationMaster: CONFIG.stationMaster, trains: CONFIG.trains, staff: CONFIG.staff, upcomingBots: CONFIG.upcomingBots, lastUpdated: CONFIG.lastUpdated, musicLastUpdated: CONFIG.musicLastUpdated };
+            CONFIG.lastUpdated = Date.now(); if (!skipMusicSync) CONFIG.musicLastUpdated = Date.now(); if (!CONFIG.musicLibrary) CONFIG.musicLibrary = []; 
+            const mainPayload = { stationMaster: CONFIG.stationMaster, trains: CONFIG.trains, staff: CONFIG.staff, upcomingBots: CONFIG.upcomingBots, aiSettings: CONFIG.aiSettings, lastUpdated: CONFIG.lastUpdated, musicLastUpdated: CONFIG.musicLastUpdated };
             try { await localforage.setItem("meown_config_backup", mainPayload); if(!skipMusicSync) await localforage.setItem("meown_music_backup", CONFIG.musicLibrary); } catch(e) { console.warn("Lỗi lưu LocalForage:", e); }
-            try { 
-                await supa.from('station_config').upsert([{ id: 1, data: JSON.stringify(mainPayload) }]); 
-                if(!skipMusicSync) { const musicPayload = JSON.stringify(CONFIG.musicLibrary); await supa.from('station_config').upsert([{ id: 2, data: musicPayload }]); }
-            } catch(e) { console.error("Lỗi đồng bộ Supabase (Có thể do file quá nặng):", e); }
+            try { await supa.from('station_config').upsert([{ id: 1, data: JSON.stringify(mainPayload) }]); if(!skipMusicSync) { const musicPayload = JSON.stringify(CONFIG.musicLibrary); await supa.from('station_config').upsert([{ id: 2, data: musicPayload }]); } } catch(e) { console.error("Lỗi đồng bộ Supabase (Có thể do file quá nặng):", e); }
         }
         
         async function fetchFeeds() {
             try { const { data: gbData } = await supa.from('meown_guestbook').select('*'); if(gbData) localGuestbook = gbData; const { data: rcData } = await supa.from('meown_recruit').select('*'); if(rcData) localRecruit = rcData; } catch(e) {}
-            renderFeed("guestbook"); renderFeed("recruit");
-            updateNotifications();
+            renderFeed("guestbook"); renderFeed("recruit"); updateNotifications();
         }
         
-        let gbB64Imgs = [];
-        document.getElementById("gbFileInp").addEventListener("change", async (ev) => {
-            for(let f of ev.target.files) { const b64 = await resizeImage(f, 1000); gbB64Imgs.push(b64); document.getElementById("gbPreview").innerHTML += `<img src="${b64}" onclick="openLightbox(this.src, event)" style="cursor:zoom-in;">`; }
-        });
+        let gbB64Imgs = []; document.getElementById("gbFileInp").addEventListener("change", async (ev) => { for(let f of ev.target.files) { const b64 = await resizeImage(f, 1000); gbB64Imgs.push(b64); document.getElementById("gbPreview").innerHTML += `<img src="${b64}" onclick="openLightbox(this.src, event)" style="cursor:zoom-in;">`; } });
         document.getElementById("guestbookForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector("button"); btn.textContent = "ĐANG GỬI..."; btn.style.pointerEvents = "none";
+            e.preventDefault(); const btn = e.target.querySelector("button"); btn.textContent = "ĐANG GỬI..."; btn.style.pointerEvents = "none";
             const post = { name: document.getElementById("gbName").value || "Khách", author: document.getElementById("gbName").value || "Khách", text: document.getElementById("gbMessage").value, content: document.getElementById("gbMessage").value, images: JSON.stringify(gbB64Imgs), date: Date.now() };
-            try {
-                const { data, error } = await supa.from('meown_guestbook').insert([post]).select();
-                if(data && data.length > 0) localGuestbook.unshift(data[0]); renderFeed("guestbook"); e.target.reset(); document.getElementById("gbPreview").innerHTML = ""; gbB64Imgs = []; alert("Đã gửi vào Sổ lưu bút!");
-            } catch(err) { console.error(err); alert("Lỗi khi đăng bài!"); }
+            try { const { data, error } = await supa.from('meown_guestbook').insert([post]).select(); if(data && data.length > 0) localGuestbook.unshift(data[0]); renderFeed("guestbook"); e.target.reset(); document.getElementById("gbPreview").innerHTML = ""; gbB64Imgs = []; alert("Đã gửi vào Sổ lưu bút!"); } catch(err) { console.error(err); alert("Lỗi khi đăng bài!"); }
             btn.textContent = "ĐĂNG BÀI"; btn.style.pointerEvents = "auto";
         });
         
-        let rcB64Imgs = [];
-        document.getElementById("rcFileInp").addEventListener("change", async (ev) => {
-            for(let f of ev.target.files) { const b64 = await resizeImage(f, 1000); rcB64Imgs.push(b64); document.getElementById("rcPreview").innerHTML += `<img src="${b64}" onclick="openLightbox(this.src, event)" style="cursor:zoom-in;">`; }
-        });
+        let rcB64Imgs = []; document.getElementById("rcFileInp").addEventListener("change", async (ev) => { for(let f of ev.target.files) { const b64 = await resizeImage(f, 1000); rcB64Imgs.push(b64); document.getElementById("rcPreview").innerHTML += `<img src="${b64}" onclick="openLightbox(this.src, event)" style="cursor:zoom-in;">`; } });
         document.getElementById("recruitForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector("button"); btn.textContent = "ĐANG GỬI..."; btn.style.pointerEvents = "none";
+            e.preventDefault(); const btn = e.target.querySelector("button"); btn.textContent = "ĐANG GỬI..."; btn.style.pointerEvents = "none";
             const post = { name: document.getElementById("rcName").value || "Khách", author: document.getElementById("rcName").value || "Khách", text: document.getElementById("rcMessage").value, content: document.getElementById("rcMessage").value, images: JSON.stringify(rcB64Imgs), date: Date.now() };
-            try {
-                const { data, error } = await supa.from('meown_recruit').insert([post]).select();
-                if(data && data.length > 0) localRecruit.unshift(data[0]); renderFeed("recruit"); e.target.reset(); document.getElementById("rcPreview").innerHTML = ""; rcB64Imgs = []; alert("Đã gửi Ý tưởng!");
-            } catch(err) { console.error(err); alert("Lỗi khi đăng bài!"); }
+            try { const { data, error } = await supa.from('meown_recruit').insert([post]).select(); if(data && data.length > 0) localRecruit.unshift(data[0]); renderFeed("recruit"); e.target.reset(); document.getElementById("rcPreview").innerHTML = ""; rcB64Imgs = []; alert("Đã gửi Ý tưởng!"); } catch(err) { console.error(err); alert("Lỗi khi đăng bài!"); }
             btn.textContent = "GỬI LÊN HỆ THỐNG"; btn.style.pointerEvents = "auto";
         });
         
         window.openAdminPost = function(type, id) { openAdminForm('post', 'edit', {type, id}); };
-        window.deletePostFromDB = async function(type, id) {
-            if(!confirm("Xóa bài đăng này vĩnh viễn?")) return;
-            const table = type === "guestbook" ? "meown_guestbook" : "meown_recruit";
-            try { await supa.from(table).delete().eq('id', id); if(type === "guestbook") { localGuestbook = localGuestbook.filter(p => p.id !== id); renderFeed("guestbook"); } else { localRecruit = localRecruit.filter(p => p.id !== id); renderFeed("recruit"); } } catch(e){}
-        };
-        window.deleteFeedback = async function(staffId, fbIndex, e) {
-            e.stopPropagation();
-            if(confirm("Xóa feedback này của khách hàng?")) {
-                const st = CONFIG.staff.find(s => s.id === staffId);
-                if(st && st.feedbacks) {
-                    st.feedbacks.splice(fbIndex, 1);
-                    let sum = 0, count = 0; st.feedbacks.forEach(f => { sum += f.stars; count++; }); st.rating = { sum, count };
-                    await saveStationConfigToDB(true); document.getElementById("generalModal").classList.add("hidden"); renderTrains();
-                }
-            }
-        };
+        window.deletePostFromDB = async function(type, id) { if(!confirm("Xóa bài đăng này vĩnh viễn?")) return; const table = type === "guestbook" ? "meown_guestbook" : "meown_recruit"; try { await supa.from(table).delete().eq('id', id); if(type === "guestbook") { localGuestbook = localGuestbook.filter(p => p.id !== id); renderFeed("guestbook"); } else { localRecruit = localRecruit.filter(p => p.id !== id); renderFeed("recruit"); } } catch(e){} };
+        window.deleteFeedback = async function(staffId, fbIndex, e) { e.stopPropagation(); if(confirm("Xóa feedback này của khách hàng?")) { const st = CONFIG.staff.find(s => s.id === staffId); if(st && st.feedbacks) { st.feedbacks.splice(fbIndex, 1); let sum = 0, count = 0; st.feedbacks.forEach(f => { sum += f.stars; count++; }); st.rating = { sum, count }; await saveStationConfigToDB(true); document.getElementById("generalModal").classList.add("hidden"); renderTrains(); } } };
         
         function renderFeed(type) {
             const container = document.getElementById(type === "guestbook" ? "guestbookFeed" : "recruitFeed");
@@ -1000,8 +869,7 @@
             posts.forEach(post => {
                 const postEl = document.createElement("div"); postEl.className = "post-card";
                 let adminBtns = isAdminMode ? `<div class="admin-action-bar"><button class="admin-edit-post" onclick="openAdminPost('${type}', ${post.id})"><span class="icon-slot" data-icon="loop"></span> Sửa</button><button class="admin-delete-post" onclick="deletePostFromDB('${type}', ${post.id})"><span class="icon-slot" data-icon="trash"></span> Xóa</button></div>` : "";
-                let imgsHtml = "";
-                if(post.images) { try { let parsedImgs = typeof post.images === 'string' ? JSON.parse(post.images) : post.images; if(parsedImgs.length > 0) { imgsHtml = `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">` + parsedImgs.map(src => `<img src="${src}" style="width:120px; height:120px; object-fit:cover; border:2px solid #333; cursor:zoom-in; border-radius:4px;" onclick="openLightbox(this.src, event)">`).join('') + `</div>`; } } catch(e) {} }
+                let imgsHtml = ""; if(post.images) { try { let parsedImgs = typeof post.images === 'string' ? JSON.parse(post.images) : post.images; if(parsedImgs.length > 0) { imgsHtml = `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">` + parsedImgs.map(src => `<img src="${src}" style="width:120px; height:120px; object-fit:cover; border:2px solid #333; cursor:zoom-in; border-radius:4px;" onclick="openLightbox(this.src, event)">`).join('') + `</div>`; } } catch(e) {} }
                 postEl.innerHTML = `<div class="post-header"><div class="post-author">${post.name || post.author || "Khách ẩn danh"}</div>${adminBtns}</div><div class="post-time">${new Date(post.date || post.created_at).toLocaleString('vi-VN')}</div><div class="post-content">${post.text || post.content || ""}</div>${imgsHtml}`;
                 container.appendChild(postEl);
             });
@@ -1012,52 +880,58 @@
         document.getElementById("ctaGoStation").addEventListener("click", () => { page1.classList.add("leaving"); setTimeout(() => { page1.style.display = "none"; page2.style.display = "block"; bgPage2.style.opacity = "1"; bgPage1.style.opacity = "0"; void page2.offsetWidth; page2.classList.add("entering"); }, 900); });
         document.getElementById("btnGoHome").addEventListener("click", () => { page2.classList.remove("entering"); bgPage2.style.opacity = "0"; bgPage1.style.opacity = "1"; setTimeout(() => { page2.style.display = "none"; page1.style.display = "flex"; page1.classList.remove("leaving"); }, 900); });
         
-        document.querySelectorAll(".nav-item").forEach(btn => { 
-            btn.addEventListener("click", (e) => { 
-                burstParticles(e); document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active")); btn.classList.add("active"); 
-                document.querySelectorAll(".section-view").forEach(v => v.classList.add("hidden")); document.getElementById("view-" + btn.dataset.view).classList.remove("hidden"); 
-            }); 
-        });
+        document.querySelectorAll(".nav-item").forEach(btn => { btn.addEventListener("click", (e) => { burstParticles(e); document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".section-view").forEach(v => v.classList.add("hidden")); document.getElementById("view-" + btn.dataset.view).classList.remove("hidden"); }); });
         
         function updateStationMasterUI() { 
-            const fbWrap = document.getElementById("smFbContainer");
-            let fbHTML = '';
+            const fbWrap = document.getElementById("smFbContainer"); let fbHTML = '';
             if(CONFIG.stationMaster.facebook && CONFIG.stationMaster.facebook.url) { fbHTML = `<a href="${CONFIG.stationMaster.facebook.url}" target="_blank" class="fb-link-box" title="${CONFIG.stationMaster.facebook.name}"><span class="icon-slot" data-icon="facebook"></span><span>${CONFIG.stationMaster.facebook.name}</span></a>`; }
-            document.getElementById("smBio").innerHTML = (CONFIG.stationMaster.bio || "Chưa có thông tin."); 
-            fbWrap.innerHTML = fbHTML;
-            loadIcons();
+            document.getElementById("smBio").innerHTML = (CONFIG.stationMaster.bio || "Chưa có thông tin."); fbWrap.innerHTML = fbHTML; loadIcons();
         }
         
-        let trainGenresList = [];
-        function renderTrGenresList() { const listContainer = document.getElementById("aTrGenreList"); if(!listContainer) return; listContainer.innerHTML = trainGenresList.map((g, i) => `<span class="c-tag" style="background:#000; border-color:var(--silver); color:var(--pearl); display:flex; align-items:center; gap:4px;">${g} <span style="cursor:pointer; color:red; font-weight:bold;" onclick="removeTrGenre(${i})">×</span></span>`).join(''); }
+        let trainGenresList = []; function renderTrGenresList() { const listContainer = document.getElementById("aTrGenreList"); if(!listContainer) return; listContainer.innerHTML = trainGenresList.map((g, i) => `<span class="c-tag" style="background:#000; border-color:var(--silver); color:var(--pearl); display:flex; align-items:center; gap:4px;">${g} <span style="cursor:pointer; color:red; font-weight:bold;" onclick="removeTrGenre(${i})">×</span></span>`).join(''); }
         window.removeTrGenre = function(i) { trainGenresList.splice(i, 1); renderTrGenresList(); };
         
         let tempGallery = []; let tempClothes = []; let tempAcc = [];
         function renderTempGallery() { const wrap = document.getElementById("aStGalleryPrev"); if(!wrap) return; wrap.innerHTML = ""; tempGallery.forEach((b64, idx) => { let div = document.createElement("div"); div.style.position = "relative"; div.innerHTML = `<img src="${b64}" style="cursor:zoom-in;" onclick="openLightbox(this.src, event)"><div class="del-img-btn" onclick="removeTempGalleryImg(${idx})">✕</div>`; wrap.appendChild(div); }); }
         window.removeTempGalleryImg = function(idx) { tempGallery.splice(idx, 1); renderTempGallery(); };
         
-        function renderTempClothes() {
-            const wrap = document.getElementById("aStClothesWrap"); if(!wrap) return; wrap.innerHTML = "";
-            tempClothes.forEach((cl, idx) => {
-                const el = document.createElement("div"); el.style.cssText = "background:#111; padding:10px; border:1px dashed #555; margin-bottom:10px; display:flex; gap:10px; align-items:center;";
-                el.innerHTML = `<img src="${cl.img}" style="width:50px; height:50px; object-fit:contain; background:#000;"><div style="flex:1;"><input type="text" placeholder="Tên trang phục..." value="${cl.name}" onchange="tempClothes[${idx}].name=this.value" style="width:100%; margin-bottom:5px; padding:5px; font-size:12px;"><input type="number" placeholder="Giá (0=Free)..." value="${cl.price}" onchange="tempClothes[${idx}].price=parseInt(this.value)||0" style="width:100%; padding:5px; font-size:12px;"></div><button type="button" onclick="tempClothes.splice(${idx},1); renderTempClothes()" style="background:#8B0000; color:#fff; border:none; padding:10px; cursor:pointer;">XÓA</button>`;
-                wrap.appendChild(el);
-            });
-        }
-        function renderTempAcc() {
-            const wrap = document.getElementById("aStAccWrap"); if(!wrap) return; wrap.innerHTML = "";
-            tempAcc.forEach((ac, idx) => {
-                const el = document.createElement("div"); el.style.cssText = "background:#111; padding:10px; border:1px dashed #555; margin-bottom:10px; display:flex; gap:10px; align-items:center;";
-                el.innerHTML = `<img src="${ac.img}" style="width:50px; height:50px; object-fit:contain; background:#000;"><div style="flex:1;"><select onchange="tempAcc[${idx}].type=this.value" style="width:100%; margin-bottom:5px; padding:5px; font-size:12px; background:#000; color:#fff;"><option value="hat" ${ac.type==='hat'?'selected':''}>Mũ/Nón</option><option value="ear" ${ac.type==='ear'?'selected':''}>Tai thú</option><option value="tail" ${ac.type==='tail'?'selected':''}>Đuôi (nằm sau)</option></select><input type="text" placeholder="Tên phụ kiện..." value="${ac.name}" onchange="tempAcc[${idx}].name=this.value" style="width:100%; margin-bottom:5px; padding:5px; font-size:12px;"><input type="number" placeholder="Giá (0=Free)..." value="${ac.price}" onchange="tempAcc[${idx}].price=parseInt(this.value)||0" style="width:100%; padding:5px; font-size:12px;"></div><button type="button" onclick="tempAcc.splice(${idx},1); renderTempAcc()" style="background:#8B0000; color:#fff; border:none; padding:10px; cursor:pointer;">XÓA</button>`;
-                wrap.appendChild(el);
-            });
-        }
+        function renderTempClothes() { const wrap = document.getElementById("aStClothesWrap"); if(!wrap) return; wrap.innerHTML = ""; tempClothes.forEach((cl, idx) => { const el = document.createElement("div"); el.style.cssText = "background:#111; padding:10px; border:1px dashed #555; margin-bottom:10px; display:flex; gap:10px; align-items:center;"; el.innerHTML = `<img src="${cl.img}" style="width:50px; height:50px; object-fit:contain; background:#000;"><div style="flex:1;"><input type="text" placeholder="Tên trang phục..." value="${cl.name}" onchange="tempClothes[${idx}].name=this.value" style="width:100%; margin-bottom:5px; padding:5px; font-size:12px;"><input type="number" placeholder="Giá (0=Free)..." value="${cl.price}" onchange="tempClothes[${idx}].price=parseInt(this.value)||0" style="width:100%; padding:5px; font-size:12px;"></div><button type="button" onclick="tempClothes.splice(${idx},1); renderTempClothes()" style="background:#8B0000; color:#fff; border:none; padding:10px; cursor:pointer;">XÓA</button>`; wrap.appendChild(el); }); }
+        function renderTempAcc() { const wrap = document.getElementById("aStAccWrap"); if(!wrap) return; wrap.innerHTML = ""; tempAcc.forEach((ac, idx) => { const el = document.createElement("div"); el.style.cssText = "background:#111; padding:10px; border:1px dashed #555; margin-bottom:10px; display:flex; gap:10px; align-items:center;"; el.innerHTML = `<img src="${ac.img}" style="width:50px; height:50px; object-fit:contain; background:#000;"><div style="flex:1;"><select onchange="tempAcc[${idx}].type=this.value" style="width:100%; margin-bottom:5px; padding:5px; font-size:12px; background:#000; color:#fff;"><option value="hat" ${ac.type==='hat'?'selected':''}>Mũ/Nón</option><option value="ear" ${ac.type==='ear'?'selected':''}>Tai thú</option><option value="tail" ${ac.type==='tail'?'selected':''}>Đuôi (nằm sau)</option></select><input type="text" placeholder="Tên phụ kiện..." value="${ac.name}" onchange="tempAcc[${idx}].name=this.value" style="width:100%; margin-bottom:5px; padding:5px; font-size:12px;"><input type="number" placeholder="Giá (0=Free)..." value="${ac.price}" onchange="tempAcc[${idx}].price=parseInt(this.value)||0" style="width:100%; padding:5px; font-size:12px;"></div><button type="button" onclick="tempAcc.splice(${idx},1); renderTempAcc()" style="background:#8B0000; color:#fff; border:none; padding:10px; cursor:pointer;">XÓA</button>`; wrap.appendChild(el); }); }
 
         window.openAdminForm = function(type, action, idOrParentId) {
             document.getElementById("generalBox").classList.remove("modal-white");
             const body = document.getElementById("generalModalBody"); document.getElementById("generalModal").classList.remove("hidden"); body.innerHTML = "";
             
-            if(type === 'sm') {
+            if (type === 'ai_settings') {
+                document.getElementById("generalModalTitle").textContent = "CÀI ĐẶT KHU GIẢI TRÍ & AI API";
+                body.innerHTML = `
+                    <div style="background:rgba(0,0,0,0.5); padding:15px; border:1px solid var(--amber); margin-bottom:15px; border-radius:4px;">
+                        <h3 style="color:var(--amber); font-family:var(--font-kicker); font-size:14px; margin-bottom:10px;">🔑 KẾT NỐI VŨ TRỤ (API KEY)</h3>
+                        <p style="font-size:12px; color:var(--silver); margin-bottom:10px;">Cắm API Key của Google Gemini hoặc OpenAI vào đây để hệ thống tự động sinh ra hàng vạn thông điệp chữa lành mới 100% khi rút quẻ và phản hồi thư tự động.</p>
+                        <input type="password" id="aAiKey" value="${CONFIG.aiSettings.apiKey || ''}" placeholder="Nhập API Key vào đây..." style="width:100%; padding:10px; margin-bottom:5px;">
+                    </div>
+                    
+                    <div style="background:rgba(0,0,0,0.5); padding:15px; border:1px solid var(--amber); margin-bottom:15px; border-radius:4px;">
+                        <h3 style="color:var(--amber); font-family:var(--font-kicker); font-size:14px; margin-bottom:10px;">🎋 SYSTEM PROMPT: QUẺ TRE (ĐÔNG PHƯƠNG)</h3>
+                        <textarea id="aPromptBamboo" style="height:100px;">${CONFIG.aiSettings.promptBamboo || ''}</textarea>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.5); padding:15px; border:1px solid var(--amber); margin-bottom:15px; border-radius:4px;">
+                        <h3 style="color:var(--amber); font-family:var(--font-kicker); font-size:14px; margin-bottom:10px;">🌌 SYSTEM PROMPT: LÁ BÀI (TÂY PHƯƠNG)</h3>
+                        <textarea id="aPromptCard" style="height:100px;">${CONFIG.aiSettings.promptCard || ''}</textarea>
+                    </div>
+                    <button class="submit-btn" id="saveAiSettings">LƯU CÀI ĐẶT</button>
+                `;
+                document.getElementById("saveAiSettings").addEventListener("click", async () => {
+                    CONFIG.aiSettings.apiKey = document.getElementById("aAiKey").value;
+                    CONFIG.aiSettings.promptBamboo = document.getElementById("aPromptBamboo").value;
+                    CONFIG.aiSettings.promptCard = document.getElementById("aPromptCard").value;
+                    await saveStationConfigToDB(true);
+                    document.getElementById("generalModal").classList.add("hidden");
+                    alert("Đã lưu Cấu hình AI thành công!");
+                });
+            }
+            else if(type === 'sm') {
                 document.getElementById("generalModalTitle").textContent = "CẬP NHẬT TRƯỞNG GA";
                 body.innerHTML = `<div class="form-row"><label>Lời giới thiệu / Tiểu sử</label><div class="rt-toolbar"><button type="button" class="rt-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold',false,null)"><b>B</b></button><button type="button" class="rt-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('italic',false,null)"><i>I</i></button><button type="button" class="rt-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('insertUnorderedList',false,null)">• List</button><input type="color" class="rt-btn" style="padding:0; width:40px; height:30px;" onmousedown="event.preventDefault()" oninput="document.execCommand('styleWithCSS', false, true); document.execCommand('foreColor',false,this.value)"><button type="button" class="rt-btn" onmousedown="event.preventDefault()" onclick="insertToggleHTML()">Thêm Nút Đóng Mở</button></div><div id="aBio" class="rt-editor" contenteditable="true">${CONFIG.stationMaster.bio || ''}</div></div><div class="form-row"><label>Tên hiển thị FB</label><input type="text" id="aFbName" value="${CONFIG.stationMaster.facebook?.name || ''}" placeholder="VD: Trưởng ga Meown"></div><div class="form-row"><label>Link Facebook</label><input type="text" id="aFbUrl" value="${CONFIG.stationMaster.facebook?.url || ''}" placeholder="https://facebook.com/..."></div><button class="submit-btn" id="saveSM">ĐỒNG BỘ LÊN MÁY CHỦ</button>`;
                 loadIcons(); window.insertToggleHTML = function() { const html = `<details open><summary>BẤM VÀO ĐÂY ĐỂ ĐỔI TÊN NÚT</summary><div style="color:var(--pearl);">Nhập nội dung hiển thị cho hành khách vào đây...</div></details><br>`; document.execCommand('insertHTML', false, html); };
@@ -1090,7 +964,6 @@
                     
                     <details style="background:rgba(0,0,0,0.5); padding:15px; border:1px solid var(--amber); margin-bottom:15px; border-radius:4px;">
                         <summary style="color:var(--amber); font-family:var(--font-kicker); font-weight:bold; cursor:pointer;">🛠️ HỆ THỐNG PROMPT NHẬP VAI (AI THƯ TAY)</summary>
-                        <!-- Hệ thống API tự động sử dụng cấu trúc ở đây để gửi cho AI -->
                         <div class="form-row" style="margin-top:15px; display:flex; gap:10px;"><div style="flex:1;"><label>Xưng hô (Self)</label><input type="text" id="aPrSelf" value="${sData.promptParams.selfP}" placeholder="ta, tôi, anh..."></div><div style="flex:1;"><label>Gọi hành khách (Target)</label><input type="text" id="aPrTarget" value="${sData.promptParams.targetP}" placeholder="nàng, em, cậu..."></div></div>
                         <div class="form-row"><label>Tính cách & Bối cảnh</label><textarea id="aPrPers" style="height:60px;">${sData.promptParams.personality}</textarea></div>
                         <div class="form-row"><label>Khẩu khí & Ngôn ngữ</label><textarea id="aPrSpeech" style="height:60px;">${sData.promptParams.speech}</textarea></div>
@@ -1287,7 +1160,7 @@
         }
         
         /* ============================================================
-           LOGIC KHU GIẢI TRÍ
+           LOGIC KHU GIẢI TRÍ VÀ HỆ THỐNG AI API (DIVERSITY ENGINE)
            ============================================================ */
         let currentMStaff = null;
         let mirrorLayers = { body: null, clothes: null, ear: null, hat: null, tail: null, anim: null };
@@ -1298,119 +1171,57 @@
             if(game === 'mailbox') initMailbox();
             if(game === 'astrolabe') resetAstrolabe();
         };
-
-        window.closeEntGame = function(game) {
-            document.getElementById(`game-${game}`).classList.add('hidden');
-        };
+        window.closeEntGame = function(game) { document.getElementById(`game-${game}`).classList.add('hidden'); };
 
         function initMirror() {
-            const wrap = document.getElementById("mStaffList");
-            wrap.innerHTML = "";
+            const wrap = document.getElementById("mStaffList"); wrap.innerHTML = "";
             let availableStaff = CONFIG.staff.filter(s => !s.isHidden || isAdminMode);
             if(availableStaff.length === 0) return;
-            
             availableStaff.forEach((st, idx) => {
-                let img = document.createElement("img");
-                img.src = st.avatar;
-                img.className = "m-staff-icon";
+                let img = document.createElement("img"); img.src = st.avatar; img.className = "m-staff-icon";
                 if(idx === 0) selectMirrorStaff(st, img);
-                img.onclick = () => {
-                    document.querySelectorAll(".m-staff-icon").forEach(i => i.classList.remove("active"));
-                    selectMirrorStaff(st, img);
-                };
+                img.onclick = () => { document.querySelectorAll(".m-staff-icon").forEach(i => i.classList.remove("active")); selectMirrorStaff(st, img); };
                 wrap.appendChild(img);
             });
         }
-        
-        function selectMirrorStaff(st, imgEl) {
-            if(imgEl) imgEl.classList.add("active");
-            currentMStaff = st;
-            mirrorLayers = { body: st.dressUp?.baseBody || '', clothes: null, ear: null, hat: null, tail: null, anim: null };
-            drawMirror();
-            switchMTab('clothes');
-        }
-
+        function selectMirrorStaff(st, imgEl) { if(imgEl) imgEl.classList.add("active"); currentMStaff = st; mirrorLayers = { body: st.dressUp?.baseBody || '', clothes: null, ear: null, hat: null, tail: null, anim: null }; drawMirror(); switchMTab('clothes'); }
         window.switchMTab = function(tab) {
-            document.getElementById("btnTabClothes").classList.remove("active");
-            document.getElementById("btnTabAcc").classList.remove("active");
-            if(tab==='clothes') document.getElementById("btnTabClothes").classList.add("active");
-            else document.getElementById("btnTabAcc").classList.add("active");
-            
-            const grid = document.getElementById("mItemsGrid");
-            grid.innerHTML = "";
+            document.getElementById("btnTabClothes").classList.remove("active"); document.getElementById("btnTabAcc").classList.remove("active");
+            if(tab==='clothes') document.getElementById("btnTabClothes").classList.add("active"); else document.getElementById("btnTabAcc").classList.add("active");
+            const grid = document.getElementById("mItemsGrid"); grid.innerHTML = "";
             if(!currentMStaff || !currentMStaff.dressUp) return;
             let items = tab === 'clothes' ? (currentMStaff.dressUp.clothes || []) : (currentMStaff.dressUp.accessories || []);
             if(items.length === 0) { grid.innerHTML = "<p style='color:var(--silver); font-size:12px;'>Trống.</p>"; return; }
-            
             items.forEach(it => {
-                let el = document.createElement("div");
-                el.className = "m-item";
-                let isEquipped = false;
+                let el = document.createElement("div"); el.className = "m-item"; let isEquipped = false;
                 if(tab === 'clothes' && mirrorLayers.clothes === it.img) isEquipped = true;
-                if(tab === 'acc') {
-                    if(it.type === 'hat' && mirrorLayers.hat === it.img) isEquipped = true;
-                    if(it.type === 'ear' && mirrorLayers.ear === it.img) isEquipped = true;
-                    if(it.type === 'tail' && mirrorLayers.tail === it.img) isEquipped = true;
-                }
+                if(tab === 'acc') { if(it.type === 'hat' && mirrorLayers.hat === it.img) isEquipped = true; if(it.type === 'ear' && mirrorLayers.ear === it.img) isEquipped = true; if(it.type === 'tail' && mirrorLayers.tail === it.img) isEquipped = true; }
                 if(isEquipped) el.classList.add("equipped");
-                
                 let priceHtml = it.price > 0 ? `<div class="m-item-price"><span class="icon-slot" data-icon="star" style="width:8px;height:8px;"></span> ${it.price}</div>` : '';
                 el.innerHTML = `${priceHtml}<img src="${it.img}">`;
-                
                 el.onclick = () => {
-                    let unlockKey = `unlocked_${currentMStaff.id}_${it.name}_${it.price}`;
-                    let isUnlocked = it.price === 0 || localStorage.getItem(unlockKey);
-                    
-                    if(!isUnlocked) {
-                        if(userMeownCoins >= it.price) {
-                            if(confirm(`Mở khóa món này với ${it.price} Đồng Xu?`)) {
-                                userMeownCoins -= it.price;
-                                updateCoinDisplay();
-                                localStorage.setItem(unlockKey, 'true');
-                                equipItem(tab, it, el);
-                            }
-                        } else {
-                            alert(`Bạn cần thêm ${it.price - userMeownCoins} Đồng Xu nữa. Hãy gieo quẻ để nhận xu nhé!`);
-                        }
-                    } else {
-                        equipItem(tab, it, el);
-                    }
+                    let unlockKey = `unlocked_${currentMStaff.id}_${it.name}_${it.price}`; let isUnlocked = it.price === 0 || localStorage.getItem(unlockKey);
+                    if(!isUnlocked) { if(userMeownCoins >= it.price) { if(confirm(`Mở khóa món này với ${it.price} Đồng Xu?`)) { userMeownCoins -= it.price; updateCoinDisplay(); localStorage.setItem(unlockKey, 'true'); equipItem(tab, it, el); } } else { alert(`Bạn cần thêm ${it.price - userMeownCoins} Đồng Xu nữa. Hãy gieo quẻ để nhận xu nhé!`); } } else { equipItem(tab, it, el); }
                 };
                 grid.appendChild(el);
             });
             loadIcons();
         };
-
         function equipItem(tab, item, el) {
-            if(tab === 'clothes') {
-                mirrorLayers.clothes = mirrorLayers.clothes === item.img ? null : item.img;
-            } else {
-                if(item.type === 'hat') mirrorLayers.hat = mirrorLayers.hat === item.img ? null : item.img;
-                if(item.type === 'ear') mirrorLayers.ear = mirrorLayers.ear === item.img ? null : item.img;
-                if(item.type === 'tail') mirrorLayers.tail = mirrorLayers.tail === item.img ? null : item.img;
-            }
+            if(tab === 'clothes') { mirrorLayers.clothes = mirrorLayers.clothes === item.img ? null : item.img; } 
+            else { if(item.type === 'hat') mirrorLayers.hat = mirrorLayers.hat === item.img ? null : item.img; if(item.type === 'ear') mirrorLayers.ear = mirrorLayers.ear === item.img ? null : item.img; if(item.type === 'tail') mirrorLayers.tail = mirrorLayers.tail === item.img ? null : item.img; }
             document.querySelectorAll(".m-item").forEach(i => i.classList.remove("equipped"));
-            if(el && ((tab === 'clothes' && mirrorLayers.clothes) || (tab === 'acc' && (mirrorLayers.hat || mirrorLayers.ear || mirrorLayers.tail)))) {
-                el.classList.add("equipped");
-            }
+            if(el && ((tab === 'clothes' && mirrorLayers.clothes) || (tab === 'acc' && (mirrorLayers.hat || mirrorLayers.ear || mirrorLayers.tail)))) { el.classList.add("equipped"); }
             drawMirror();
         }
-
         window.playMAnim = function(type) {
-            if(!currentMStaff || !currentMStaff.dressUp) return;
-            let animSrc = "";
-            if(type==='smile') animSrc = currentMStaff.dressUp.animSmile;
-            if(type==='hi') animSrc = currentMStaff.dressUp.animHi;
-            if(type==='bow') animSrc = currentMStaff.dressUp.animBow;
+            if(!currentMStaff || !currentMStaff.dressUp) return; let animSrc = "";
+            if(type==='smile') animSrc = currentMStaff.dressUp.animSmile; if(type==='hi') animSrc = currentMStaff.dressUp.animHi; if(type==='bow') animSrc = currentMStaff.dressUp.animBow;
             if(!animSrc) { alert("Nhân vật này chưa học hành động này."); return; }
-            mirrorLayers.anim = animSrc;
-            drawMirror();
-            setTimeout(() => { mirrorLayers.anim = null; drawMirror(); }, 3000);
+            mirrorLayers.anim = animSrc; drawMirror(); setTimeout(() => { mirrorLayers.anim = null; drawMirror(); }, 3000);
         };
-
         function drawMirror() {
-            const frame = document.getElementById("mirrorFrame");
-            frame.innerHTML = "";
+            const frame = document.getElementById("mirrorFrame"); frame.innerHTML = "";
             if(mirrorLayers.tail) frame.innerHTML += `<img src="${mirrorLayers.tail}" class="m-layer" style="z-index: 1;">`;
             if(mirrorLayers.body) frame.innerHTML += `<img src="${mirrorLayers.body}" class="m-layer" style="z-index: 2;">`;
             if(mirrorLayers.clothes) frame.innerHTML += `<img src="${mirrorLayers.clothes}" class="m-layer" style="z-index: 3;">`;
@@ -1418,62 +1229,92 @@
             if(mirrorLayers.hat) frame.innerHTML += `<img src="${mirrorLayers.hat}" class="m-layer" style="z-index: 5;">`;
             if(mirrorLayers.anim) frame.innerHTML += `<img src="${mirrorLayers.anim}" class="m-layer" style="z-index: 6;">`;
         }
-
         window.downloadMirror = function() {
-            const canvas = document.getElementById("mirrorCanvasExport");
-            const ctx = canvas.getContext("2d");
-            canvas.width = 720;
-            canvas.height = 1280;
-            ctx.fillStyle = "#1a1510";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            let layers = [ mirrorLayers.tail, mirrorLayers.body, mirrorLayers.clothes, mirrorLayers.ear, mirrorLayers.hat ].filter(Boolean);
-            let loadedCount = 0;
-            if(layers.length === 0) return alert("Chưa mặc gì!");
-            layers.forEach(src => {
-                let img = new Image();
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    loadedCount++;
-                    if(loadedCount === layers.length) {
-                        const link = document.createElement("a");
-                        link.download = `Meown_${currentMStaff.name}_Outfit.png`;
-                        link.href = canvas.toDataURL("image/png");
-                        link.click();
-                        alert("Đã lưu hình ảnh vào máy!");
-                    }
-                };
-                img.src = src;
-            });
+            const canvas = document.getElementById("mirrorCanvasExport"); const ctx = canvas.getContext("2d"); canvas.width = 720; canvas.height = 1280; ctx.fillStyle = "#1a1510"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            let layers = [ mirrorLayers.tail, mirrorLayers.body, mirrorLayers.clothes, mirrorLayers.ear, mirrorLayers.hat ].filter(Boolean); let loadedCount = 0; if(layers.length === 0) return alert("Chưa mặc gì!");
+            layers.forEach(src => { let img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); loadedCount++; if(loadedCount === layers.length) { const link = document.createElement("a"); link.download = `Meown_${currentMStaff.name}_Outfit.png`; link.href = canvas.toDataURL("image/png"); link.click(); alert("Đã lưu hình ảnh vào máy!"); } }; img.src = src; });
         };
+
+        // --- CƠ CHẾ GỌI API AI LÕI CHUNG ---
+        async function fetchAIResponse(systemPrompt, userMessage) {
+            const apiKey = CONFIG.aiSettings?.apiKey;
+            
+            // FALLBACK NẾU KHÔNG CÓ API KEY HOẶC LỖI (MÁY PHÁT ĐIỆN DỰ PHÒNG CỦA ADMIN ĐỂ ĐẢM BẢO ĐA DẠNG)
+            if (!apiKey || apiKey.trim() === "") {
+                return generateFallbackMessage(systemPrompt);
+            }
+
+            // Gọi API Gemini hoặc OpenAI (Ở đây dùng mô hình Gemini API chuẩn làm ví dụ thực chiến)
+            try {
+                // Tùy theo key mà Admin nhập, ta có thể nhận diện độ dài để gọi đúng endpoint, mặc định ở đây viết API gọi Gemini của Google
+                const isGemini = apiKey.startsWith("AIzaSy");
+                if (isGemini) {
+                    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        "system_instruction": { "parts": { "text": systemPrompt } },
+                        "contents": [{ "parts": [{ "text": userMessage }] }]
+                    };
+                    const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                    const data = await response.json();
+                    if(data.error) throw new Error(data.error.message);
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    // Giả định nếu là OpenAI
+                    const endpoint = "https://api.openai.com/v1/chat/completions";
+                    const payload = { model: "gpt-4o-mini", messages: [ { role: "system", content: systemPrompt }, { role: "user", content: userMessage } ] };
+                    const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify(payload) });
+                    const data = await response.json();
+                    if(data.error) throw new Error(data.error.message);
+                    return data.choices[0].message.content;
+                }
+            } catch (error) {
+                console.error("AI API Error:", error);
+                // Rơi vào Fallback nếu sập mạng hoặc key lỗi
+                return generateFallbackMessage(systemPrompt);
+            }
+        }
+
+        function generateFallbackMessage(systemPrompt) {
+            // Máy trộn từ vựng đa dạng hóa offline
+            const isBamboo = systemPrompt.toLowerCase().includes("tre") || systemPrompt.toLowerCase().includes("hán");
+            const isStaffMail = systemPrompt.toLowerCase().includes("bản chỉ thị");
+
+            if (isStaffMail) {
+                return "(Tín hiệu hồi đáp từ Không Gian Meown)...\nCó vẻ đường truyền ma thuật đang nghẽn. Xin lữ khách hãy gửi thư lại vào lúc khác nhé!";
+            }
+
+            if (isBamboo) {
+                const b_sub = ["Hữu duyên ngàn dặm", "Gió lộng ngàn mây", "Giữa chốn bồng lai", "Nơi bến ga tĩnh mịch"];
+                const b_act = ["xin nhắn nhủ lữ khách rằng:", "quẻ tre đã chỉ rõ:", "định mệnh khẽ nói:"];
+                const b_vib = ["đừng cố ôm giữ gió trời, vạn sự tùy duyên.", "bão tố qua đi, hoa sen sẽ nở rộ.", "muộn phiền ngày cũ xin hãy thả trôi theo dòng nước."];
+                const b_end = ["Chúc thân tâm an lạc.", "Vạn sự cát tường.", "Hẹn ngày tái ngộ bình an."];
+                return `${b_sub[Math.floor(Math.random()*b_sub.length)]}, ${b_act[Math.floor(Math.random()*b_act.length)]} ${b_vib[Math.floor(Math.random()*b_vib.length)]} ${b_end[Math.floor(Math.random()*b_end.length)]}`;
+            } else {
+                const c_sub = ["Các tinh tú", "Vũ trụ bao la", "Nguồn năng lượng bạc", "Ngôi sao phương Bắc"];
+                const c_act = ["đang hướng về phía bạn hôm nay.", "đang gửi một cái ôm đến bạn.", "nhắc nhở bạn rằng:"];
+                const c_vib = ["bạn là một nguyên bản lấp lánh.", "những nỗi buồn rồi sẽ tan thành ánh sáng.", "trực giác của bạn chính là ngọn hải đăng rực rỡ nhất."];
+                const c_end = ["Hãy trân trọng chính mình.", "Bạn đã làm rất tốt.", "Bình yên đang ở cạnh bạn."];
+                return `${c_sub[Math.floor(Math.random()*c_sub.length)]} ${c_act[Math.floor(Math.random()*c_act.length)]} ${c_vib[Math.floor(Math.random()*c_vib.length)]} ${c_end[Math.floor(Math.random()*c_end.length)]}`;
+            }
+        }
 
         // --- GAME 2: BƯU CỤC ---
         let mailMode = 'random';
         window.selectMailMode = function(mode) {
             mailMode = mode;
-            document.getElementById("btnMailRand").classList.remove("active");
-            document.getElementById("btnMailSpec").classList.remove("active");
-            if(mode === 'random') {
-                document.getElementById("btnMailRand").classList.add("active");
-                document.getElementById("mailSpecSelectWrap").style.display = "none";
-            } else {
-                document.getElementById("btnMailSpec").classList.add("active");
-                document.getElementById("mailSpecSelectWrap").style.display = "block";
-                const sel = document.getElementById("mailStaffSelect");
-                sel.innerHTML = "";
-                let availableStaff = CONFIG.staff.filter(s => !s.isHidden || isAdminMode);
-                availableStaff.forEach(s => { sel.innerHTML += `<option value="${s.id}">${s.name}</option>`; });
-            }
+            document.getElementById("btnMailRand").classList.remove("active"); document.getElementById("btnMailSpec").classList.remove("active");
+            if(mode === 'random') { document.getElementById("btnMailRand").classList.add("active"); document.getElementById("mailSpecSelectWrap").style.display = "none"; } 
+            else { document.getElementById("btnMailSpec").classList.add("active"); document.getElementById("mailSpecSelectWrap").style.display = "block"; const sel = document.getElementById("mailStaffSelect"); sel.innerHTML = ""; let availableStaff = CONFIG.staff.filter(s => !s.isHidden || isAdminMode); availableStaff.forEach(s => { sel.innerHTML += `<option value="${s.id}">${s.name}</option>`; }); }
         };
 
-        document.getElementById("btnSendMail").addEventListener("click", () => {
-            const body = document.getElementById("mailBody").value.trim();
-            if(!body) return alert("Bạn chưa viết gì cả!");
+        document.getElementById("btnSendMail").addEventListener("click", async () => {
+            const bodyText = document.getElementById("mailBody").value.trim();
+            if(!bodyText) return alert("Bạn chưa viết gì cả!");
             
             let selectedStaff = null;
             if(mailMode === 'specific') {
-                if(userMeownCoins < 1) return alert("Bạn không đủ Đồng Xu để gửi đích danh. Hãy gieo quẻ để nhận thêm!");
-                userMeownCoins -= 1;
-                updateCoinDisplay();
+                if(userMeownCoins < 1 && !isAdminMode) return alert("Bạn không đủ Đồng Xu để gửi đích danh. Hãy gieo quẻ để nhận thêm!");
+                if (!isAdminMode) { userMeownCoins -= 1; updateCoinDisplay(); }
                 const selId = document.getElementById("mailStaffSelect").value;
                 selectedStaff = CONFIG.staff.find(s => s.id === selId);
             } else {
@@ -1482,74 +1323,49 @@
                 selectedStaff = availableStaff[Math.floor(Math.random() * availableStaff.length)];
             }
             
-            document.getElementById("btnSendMail").style.display = "none";
-            document.getElementById("mailBody").style.display = "none";
-            document.getElementById("mailLoader").style.display = "block";
+            document.getElementById("btnSendMail").style.display = "none"; document.getElementById("mailBody").style.display = "none"; document.getElementById("mailLoader").style.display = "block";
             
-            // AI Prompt System Simulation (Frontend Fallback for "The AI Prompt Injection")
-            // Normally this goes to a backend API. We simulate the AI's understanding of the Prompt Injection here.
-            setTimeout(() => {
-                document.getElementById("mailLoader").style.display = "none";
-                const replyBox = document.getElementById("mailReply");
-                replyBox.style.display = "block";
-                
-                let p = selectedStaff.promptParams || {};
-                let selfP = p.selfP || "ta";
-                let targetP = p.targetP || "bạn";
-                let sig = p.signature || "Trân trọng.";
-                let tone = p.speech || "Ngắn gọn, tinh tế.";
-                
-                // MOCK API AI Response based on System Prompt Rules
-                replyBox.innerHTML = `(Dấu ấn sáp đỏ của ${selectedStaff.name})<br><br>Đã nhận được thư của ${targetP}.<br>Ga Meown luôn dang rộng vòng tay đón ${targetP}. Mong ${targetP} luôn bình an. ${tone ? '<br><i>(AI đã đọc cấu trúc văn phong: '+tone+')</i>' : ''}<br><br>---<br>${sig}`;
-                
-                document.getElementById("btnEndMail").classList.remove("hidden");
-                
-                const writeBack = document.createElement("button");
-                writeBack.className = "submit-btn";
-                writeBack.style.marginTop = "15px";
-                writeBack.textContent = "✍️ VIẾT LẠI";
-                writeBack.onclick = () => {
-                    document.getElementById("mailBody").value = "";
-                    document.getElementById("mailBody").style.display = "block";
-                    replyBox.style.display = "none";
-                    document.getElementById("btnSendMail").style.display = "block";
-                    document.getElementById("btnEndMail").classList.add("hidden");
-                };
-                replyBox.appendChild(writeBack);
-                
-            }, 3000);
+            // XÂY DỰNG LỆNH PROMPT THEO YÊU CẦU CỦA ADMIN
+            let p = selectedStaff.promptParams || {};
+            let selfP = p.selfP || "ta";
+            let targetP = p.targetP || "bạn";
+            let sig = p.signature || "Trân trọng.";
+            let tone = p.speech || "Nói chuyện ngắn gọn.";
+            let pers = p.personality || "Một nhân viên nhà ga vui vẻ.";
+
+            let sysPrompt = `[BẢN CHỈ THỊ NHẬP VAI KHẨN CẤP]
+Bạn là một nhân viên túc trực tại Ga Meown. Bạn vừa nhận được bức thư sau từ hành khách: "${bodyText}".
+Hãy viết một bức thư tay hồi đáp họ. Tuân thủ 100% các thiết lập:
+- Cách xưng hô: Bạn tự xưng là "${selfP}" và gọi hành khách là "${targetP}".
+- Tính cách của bạn: ${pers}.
+- Cách viết thư: ${tone}. Không nhắc đến AI.
+- Cuối thư, bạn bắt buộc phải kết thúc bằng cụm từ: "${sig}".`;
+
+            // GỌI AI THẬT SỰ
+            let aiReply = await fetchAIResponse(sysPrompt, "Hãy viết thư hồi đáp đi.");
+
+            document.getElementById("mailLoader").style.display = "none";
+            const replyBox = document.getElementById("mailReply");
+            replyBox.style.display = "block";
+            
+            // Xóa dấu markdown dư thừa từ AI nếu có
+            aiReply = aiReply.replace(/```/g, '');
+
+            replyBox.innerHTML = `(Dấu ấn sáp đỏ của ${selectedStaff.name})<br><br>${aiReply}`;
+            document.getElementById("btnEndMail").classList.remove("hidden");
+            
+            const writeBack = document.createElement("button"); writeBack.className = "submit-btn"; writeBack.style.marginTop = "15px"; writeBack.textContent = "✍️ VIẾT LẠI";
+            writeBack.onclick = () => { document.getElementById("mailBody").value = ""; document.getElementById("mailBody").style.display = "block"; replyBox.style.display = "none"; document.getElementById("btnSendMail").style.display = "block"; document.getElementById("btnEndMail").classList.add("hidden"); };
+            replyBox.appendChild(writeBack);
         });
 
-        function initMailbox() {
-            document.getElementById("mailBody").value = "";
-            document.getElementById("mailBody").style.display = "block";
-            document.getElementById("mailReply").style.display = "none";
-            document.getElementById("btnSendMail").style.display = "block";
-            document.getElementById("btnEndMail").classList.add("hidden");
-            selectMailMode('random');
-        }
+        function initMailbox() { document.getElementById("mailBody").value = ""; document.getElementById("mailBody").style.display = "block"; document.getElementById("mailReply").style.display = "none"; document.getElementById("btnSendMail").style.display = "block"; document.getElementById("btnEndMail").classList.add("hidden"); selectMailMode('random'); }
 
-        // --- GAME 3: GIEO QUẺ ---
-        const fortuneBamboo = [
-            "Hữu duyên ngàn dặm, sân ga khói sương hôm nay đón bước chân người tĩnh lặng. Quẻ tre báo rằng: Vạn sự tùy duyên, hoa nở ắt có thời, muộn phiền ngày cũ xin hãy thả trôi theo dòng nước. Chúc lữ khách một ngày cát tường, thân tâm an lạc, vạn sự hanh thông.",
-            "Thế gian vội vã trăm ngả đường, nhưng nơi đây thời gian đã ngưng đọng để vỗ về lòng người. Săm tre hiện chữ 'Tự Tại': Đừng cưỡng cầu những điều đã mất, hãy trân trọng đóa hoa đang nở trong tay mình. Ga Meown chúc lữ khách một ngày gió lặng mây quang, lòng không gợn sóng."
-        ];
-        
-        const fortuneCard = [
-            "Thông điệp từ các tinh tú gửi đến tần số của bạn hôm nay: Những mệt mỏi bạn đang mang chỉ là một khoảng nghỉ ngắn trước khi ánh bình minh lộng lẫy nhất ló rạng. Vũ trụ đang sắp xếp mọi nguồn năng lượng lành tính nhất để ôm ấp và bảo bọc đứa con kiên cường của mình. Hãy hít một hơi thật sâu, ngày hôm nay mọi điều tuyệt vời đang dịu dàng tìm đến bạn.",
-            "Lá bài lấp lánh hào quang ngọc lam nhắc nhở bạn rằng trực giác của bạn chính là ngọn hải đăng rực rỡ nhất trong đêm tối. Đừng bao giờ nghi ngờ giá trị của bản thân, bởi vì sự tồn tại của bạn là một mảnh ghép độc bản và lấp lánh giữa dải ngân hà này. Hãy để năng lượng bình yên hôm nay ôm lấy bạn, bạn đã làm rất tốt rồi."
-        ];
+        // --- GAME 3: GIEO QUẺ CHỮA LÀNH ---
+        function resetAstrolabe() { document.getElementById("astroActions").style.display = "flex"; document.getElementById("astroResult").style.display = "none"; document.getElementById("astroCoinDrop").classList.add("hidden"); document.getElementById("astroLottie").style.display = "none"; document.getElementById("astroLottie").classList.remove("anim-shake"); }
 
-        function resetAstrolabe() {
-            document.getElementById("astroActions").style.display = "flex";
-            document.getElementById("astroResult").style.display = "none";
-            document.getElementById("astroCoinDrop").classList.add("hidden");
-            document.getElementById("astroLottie").style.display = "none";
-            document.getElementById("astroLottie").classList.remove("anim-shake");
-        }
-
-        window.playAstrolabe = function(type) {
-            // Check Rate Limit (24h)
+        window.playAstrolabe = async function(type) {
+            // Check Rate Limit (24h) - Bỏ qua nếu là Admin
             if (!isAdminMode) {
                 let lastDraw = localStorage.getItem('last_draw_time');
                 if (lastDraw && Date.now() - parseInt(lastDraw) < 24 * 60 * 60 * 1000) {
@@ -1563,155 +1379,35 @@
             lottie.style.display = "block";
             lottie.classList.add("anim-shake");
             
-            setTimeout(() => {
-                lottie.style.display = "none";
-                lottie.classList.remove("anim-shake");
-                
-                const resBox = document.getElementById("astroResult");
-                const msgText = document.getElementById("astroMsgText");
-                const coinDrop = document.getElementById("astroCoinDrop");
-                
-                resBox.style.display = "block";
-                
-                // MOCK API GENERATION based on the provided Prompt Engineering specs
-                if (type === 'bamboo') {
-                    resBox.className = "astro-result-box style-bamboo";
-                    msgText.textContent = fortuneBamboo[Math.floor(Math.random() * fortuneBamboo.length)];
-                } else {
-                    resBox.className = "astro-result-box style-card";
-                    msgText.textContent = fortuneCard[Math.floor(Math.random() * fortuneCard.length)];
-                }
-                
-                if (!isAdminMode) {
-                    localStorage.setItem('last_draw_time', Date.now());
-                }
+            // Chuẩn bị System Prompt gọi AI theo hệ phái
+            let basePrompt = type === 'bamboo' 
+                ? (CONFIG.aiSettings?.promptBamboo || "Viết 2-3 câu chữa lành thiền định Á Đông.")
+                : (CONFIG.aiSettings?.promptCard || "Viết 2-3 câu chữa lành theo ngôn ngữ Vũ trụ/Tarot.");
+            
+            let seed = `ID: ${Date.now()}. Random factor: ${Math.random()}. Yêu cầu đẻ ra câu mới 100% không được lặp lại.`;
+            let prompt = `${basePrompt}\nYêu cầu: Viết ra nội dung duy nhất 1 đoạn. Seed để ngẫu nhiên hóa: ${seed}`;
 
-                // 30% chance for Coin (or forced if Admin wants to test)
-                if(Math.random() < 0.3 || isAdminMode) {
-                    coinDrop.classList.remove("hidden");
-                    userMeownCoins++;
-                    updateCoinDisplay();
-                }
-            }, 1500);
-        };
+            // GỌI AI THẬT SỰ
+            let fortuneText = await fetchAIResponse(prompt, "Hãy cho tôi một thông điệp.");
 
-        // ============================================================
-        // LOGIC HỘP NHẠC
-        // ============================================================
-        let isPlaying = false;
-        let currentSongIndex = -1;
-        
-        document.getElementById("gramoToggle").addEventListener("click", () => {
-            const panel = document.getElementById("gramoPanel");
-            if (panel.classList.contains("hidden-panel")) { panel.classList.remove("hidden-panel"); } 
-            else { panel.classList.add("hidden-panel"); }
-        });
-        document.getElementById("gramoClose").addEventListener("click", () => { document.getElementById("gramoPanel").classList.add("hidden-panel"); });
-        document.getElementById("btnBackToPL").addEventListener("click", () => {
-            document.getElementById("gramoViewSongs").style.display = "none";
-            document.getElementById("gramoViewPlaylists").style.display = "block";
-            activeMusicPl = null;
-        });
-        window.renderGramoPlaylists = function() {
-            const container = document.getElementById("gramoPlaylistContainer");
-            if(!container) return; container.innerHTML = "";
-            if(!CONFIG.musicLibrary || CONFIG.musicLibrary.length === 0) { container.innerHTML = "<p style='color:var(--silver); font-style:italic;'>Chưa có Playlist nào.</p>"; return; }
-            CONFIG.musicLibrary.forEach(pl => {
-                const plEl = document.createElement("div"); plEl.className = "gramo-pl-item";
-                let adminBtns = isAdminMode ? `<div style="display:flex; gap:6px;"><button style="background:transparent; border:none; color:var(--amber); cursor:pointer;" onclick="openAdminForm('playlist', 'edit', '${pl.id}'); event.stopPropagation();">✏️</button><button style="background:transparent; border:none; color:#8B0000; cursor:pointer;" onclick="deletePlaylist('${pl.id}', event)">🗑️</button></div>` : "";
-                plEl.innerHTML = `<div><span class="icon-slot" data-icon="disc"></span> ${pl.name} (${pl.songs ? pl.songs.length : 0})</div>${adminBtns}`;
-                plEl.onclick = () => { activeMusicPl = pl.id; document.getElementById("gramoViewPlaylists").style.display = "none"; document.getElementById("gramoViewSongs").style.display = "block"; document.getElementById("currentPlNameDisplay").textContent = pl.name; renderGramoSongs(pl.id); };
-                container.appendChild(plEl);
-            });
-            loadIcons();
-        };
-        window.deletePlaylist = async function(plId, e) {
-            e.stopPropagation();
-            if(confirm("XÓA PLAYLIST NÀY?")) { CONFIG.musicLibrary = CONFIG.musicLibrary.filter(p => p.id !== plId); await saveStationConfigToDB(false); renderGramoPlaylists(); }
-        };
-        window.renderGramoSongs = function(plId) {
-            const container = document.getElementById("gramoSongList");
-            if(!container) return; container.innerHTML = "";
-            const pl = CONFIG.musicLibrary.find(p => p.id === plId);
-            if(!pl || !pl.songs || pl.songs.length === 0) { container.innerHTML = "<p style='color:var(--silver); font-style:italic;'>Playlist trống.</p>"; return; }
-            pl.songs.forEach((song, index) => {
-                const sgEl = document.createElement("div"); sgEl.className = "gramo-song-item";
-                let adminBtns = isAdminMode ? `<div style="display:flex; gap:6px;"><button style="background:transparent; border:none; color:var(--amber); cursor:pointer;" onclick="openAdminForm('song', 'edit', ${index}); event.stopPropagation();">✏️</button><button style="background:transparent; border:none; color:#8B0000; cursor:pointer;" onclick="deleteSong('${pl.id}', ${index}, event)">🗑️</button></div>` : "";
-                sgEl.innerHTML = `<div><span class="icon-slot" data-icon="play"></span> ${song.title}</div>${adminBtns}`;
-                sgEl.onclick = () => { playSong(pl.id, index); };
-                container.appendChild(sgEl);
-            });
-            loadIcons();
-        };
-        window.deleteSong = async function(plId, index, e) {
-            e.stopPropagation();
-            if(confirm("XÓA BÀI HÁT NÀY?")) { const pl = CONFIG.musicLibrary.find(p => p.id === plId); if(pl) { pl.songs.splice(index, 1); await saveStationConfigToDB(false); renderGramoSongs(plId); } }
-        };
-        const audioEl = document.getElementById("gramoAudio");
-        const seekSlider = document.getElementById("seekSlider");
-        const currTimeEl = document.getElementById("currTime");
-        const totalTimeEl = document.getElementById("totalTime");
-        function formatTime(seconds) { if (isNaN(seconds)) return "0:00"; const m = Math.floor(seconds / 60); const s = Math.floor(seconds % 60); return `${m}:${s < 10 ? '0' : ''}${s}`; }
-        audioEl.addEventListener("loadedmetadata", () => { seekSlider.max = Math.floor(audioEl.duration); totalTimeEl.textContent = formatTime(audioEl.duration); });
-        audioEl.addEventListener("timeupdate", () => { seekSlider.value = Math.floor(audioEl.currentTime); currTimeEl.textContent = formatTime(audioEl.currentTime); });
-        seekSlider.addEventListener("input", () => { audioEl.currentTime = seekSlider.value; currTimeEl.textContent = formatTime(seekSlider.value); });
-        
-        window.playSong = function(plId, index) {
-            const pl = CONFIG.musicLibrary.find(p => p.id === plId);
-            if(!pl || !pl.songs || !pl.songs[index]) return;
-            const song = pl.songs[index];
-            audioEl.src = song.src; audioEl.play(); isPlaying = true; currentSongIndex = index; activeMusicPl = plId;
+            lottie.style.display = "none";
+            lottie.classList.remove("anim-shake");
+            const resBox = document.getElementById("astroResult");
+            const msgText = document.getElementById("astroMsgText");
+            const coinDrop = document.getElementById("astroCoinDrop");
             
-            document.getElementById("gramoTitle").textContent = song.title;
-            document.getElementById("musicBoxVinyl").classList.add("playing");
-            document.getElementById("musicBoxStylus").classList.add("playing");
-            document.getElementById("gramoToggle").classList.remove("paused");
-            document.getElementById("gramoPlay").innerHTML = '<span class="icon-slot" data-icon="pause"></span>';
-            loadIcons();
+            resBox.style.display = "block";
+            if (type === 'bamboo') { resBox.className = "astro-result-box style-bamboo"; } else { resBox.className = "astro-result-box style-card"; }
             
-            if(noteInterval) clearInterval(noteInterval);
-            noteInterval = setInterval(spawnNote, 800);
+            // Xóa markdown của AI
+            msgText.textContent = fortuneText.replace(/[\*\"\`]/g, '');
             
-            const allSongs = document.querySelectorAll(".gramo-song-item");
-            allSongs.forEach(el => el.classList.remove("active"));
-            if(allSongs[index]) allSongs[index].classList.add("active");
-        };
-        document.getElementById("gramoPlay").addEventListener("click", () => {
-            if(audioEl.src) {
-                if(isPlaying) {
-                    audioEl.pause(); isPlaying = false;
-                    document.getElementById("musicBoxVinyl").classList.remove("playing");
-                    document.getElementById("musicBoxStylus").classList.remove("playing");
-                    document.getElementById("gramoToggle").classList.add("paused");
-                    document.getElementById("gramoPlay").innerHTML = '<span class="icon-slot" data-icon="play"></span>';
-                    if(noteInterval) clearInterval(noteInterval);
-                } else {
-                    audioEl.play(); isPlaying = true;
-                    document.getElementById("musicBoxVinyl").classList.add("playing");
-                    document.getElementById("musicBoxStylus").classList.add("playing");
-                    document.getElementById("gramoToggle").classList.remove("paused");
-                    document.getElementById("gramoPlay").innerHTML = '<span class="icon-slot" data-icon="pause"></span>';
-                    if(noteInterval) clearInterval(noteInterval);
-                    noteInterval = setInterval(spawnNote, 800);
-                }
-                loadIcons();
+            if (!isAdminMode) { localStorage.setItem('last_draw_time', Date.now()); }
+
+            if(Math.random() < 0.3 || isAdminMode) {
+                coinDrop.classList.remove("hidden"); userMeownCoins++; updateCoinDisplay();
             }
-        });
-        document.getElementById("gramoPrev").addEventListener("click", () => { if(activeMusicPl && currentSongIndex > 0) playSong(activeMusicPl, currentSongIndex - 1); });
-        document.getElementById("gramoNext").addEventListener("click", () => { const pl = CONFIG.musicLibrary.find(p => p.id === activeMusicPl); if(pl && currentSongIndex < pl.songs.length - 1) playSong(activeMusicPl, currentSongIndex + 1); });
-        audioEl.addEventListener("ended", () => {
-            const pl = CONFIG.musicLibrary.find(p => p.id === activeMusicPl);
-            if(pl && currentSongIndex < pl.songs.length - 1) { playSong(activeMusicPl, currentSongIndex + 1); } 
-            else {
-                isPlaying = false;
-                document.getElementById("musicBoxVinyl").classList.remove("playing");
-                document.getElementById("musicBoxStylus").classList.remove("playing");
-                document.getElementById("gramoToggle").classList.add("paused");
-                document.getElementById("gramoPlay").innerHTML = '<span class="icon-slot" data-icon="play"></span>';
-                if(noteInterval) clearInterval(noteInterval);
-                loadIcons();
-            }
-        });
+        };
     </script>
 </body>
 </html>
