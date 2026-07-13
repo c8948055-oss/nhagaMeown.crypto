@@ -425,7 +425,6 @@
                     <div class="cat-eye right"></div>
                 </div>
             </div>
-            <!-- DOUBLE CLICK VÀO DÒNG CHỮ NÀY ĐỂ MỞ QUYỀN ADMIN -->
             <p class="kicker" id="secretAdminTrigger" title="Click đúp để mở lối vào ẩn của Trưởng ga">CHÀO MỪNG QUÝ KHÁCH ĐẾN VỚI</p>
             <h1 class="heading">NHÀ GA MEOWN</h1>
             <p class="body-text">Ở rìa của thực tại, nơi sương mù không bao giờ tan có một nhà ga nhỏ mang tên Meown. Đến với ga, quý khách không cần mua vé bằng tiền. Chỉ cần bạn bước lên chuyến tàu phù hợp, chọn một nhân viên và bắt đầu trò chuyện, con tàu sẽ tự động lăn bánh.</p>
@@ -490,7 +489,9 @@
             </div>
             <!-- TRẠM TUYỂN DỤNG -->
             <div class="section-view hidden" id="view-recruitment">
-                <h2 class="embossed-title" style="margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">HỒ SƠ DỰ BỊ</h2>
+                <h2 class="embossed-title" style="margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
+                    HỒ SƠ DỰ BỊ
+                </h2>
                 <div class="admin-only-flex" style="margin-bottom: 20px;">
                     <button class="submit-btn" style="width:auto; background:var(--amber); color:#000;" onclick="openAdminForm('upcoming', 'add')">➕ THÊM HỒ SƠ DỰ BỊ</button>
                 </div>
@@ -620,10 +621,10 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
-    
     <!-- HỘP NHẠC -->
     <button class="gramo-toggle paused" id="gramoToggle" title="Bật/Tắt Hộp Nhạc"><span class="vinyl-spin icon-slot" data-icon="disc"></span></button>
     <div class="gramo-panel-new hidden-panel" id="gramoPanel">
@@ -633,6 +634,7 @@
                 <button id="gramoClose" title="Đóng hộp nhạc">✕</button>
             </div>
         </div>
+        
         <div class="g-stage">
             <div class="mini-vinyl-container">
                 <div class="mini-vinyl" id="musicBoxVinyl"></div>
@@ -642,6 +644,7 @@
                 Đang phát:<br><span id="gramoTitle" style="color:var(--amber);">Chưa có</span>
             </div>
         </div>
+        <!-- MÀN HÌNH DANH SÁCH PLAYLIST -->
         <div id="gramoViewPlaylists" class="gramo-scroll-area">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
                 <span style="font-size:11px; font-weight:bold; color:var(--silver); text-transform:uppercase;">Danh sách Playlist</span>
@@ -649,6 +652,7 @@
             </div>
             <div id="gramoPlaylistContainer"></div>
         </div>
+        <!-- MÀN HÌNH DANH SÁCH BÀI HÁT (ẨN MẶC ĐỊNH) -->
         <div id="gramoViewSongs" class="gramo-scroll-area" style="display:none;">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
                 <button class="g-back-btn" id="btnBackToPL">🔙 Quay lại Danh sách</button>
@@ -657,6 +661,8 @@
             <div id="currentPlNameDisplay" style="font-size:11px; color:var(--amber); margin-bottom:10px; font-weight:bold; text-transform:uppercase;"></div>
             <div id="gramoSongList"></div>
         </div>
+        
+        <!-- THANH SEEKBAR MỚI THÊM -->
         <div class="gramo-progress-container">
             <span id="currTime">0:00</span>
             <input type="range" id="seekSlider" class="seek-slider" value="0" min="0" max="100" step="1">
@@ -671,7 +677,6 @@
         </div>
         <audio id="gramoAudio"></audio>
     </div>
-    
     <!-- MODAL CHUNG CHO TOÀN BỘ FORM -->
     <div class="overlay-modal hidden" id="generalModal">
         <div class="modal-box" id="generalBox">
@@ -682,7 +687,6 @@
             <div id="generalModalBody"></div>
         </div>
     </div>
-    
     <script>
         const ICONS = {
             user: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/></svg>',
