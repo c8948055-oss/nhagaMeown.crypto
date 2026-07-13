@@ -371,10 +371,16 @@
         .astro-btn-group { display: flex; gap: 20px; }
         .astro-btn { background: rgba(0,0,0,0.8); border: 2px solid var(--amber); padding: 15px 30px; color: var(--amber); font-family: var(--font-kicker); font-weight: 900; font-size: 15px; text-transform: uppercase; cursor: pointer; transition: 0.3s; border-radius: 4px; box-shadow: 4px 4px 0 #000; }
         .astro-btn:hover { background: var(--amber); color: #000; box-shadow: 0 0 20px var(--amber-glow), 6px 6px 0 #000; }
-        .astro-result-box { width: 100%; background: #F4F1EA; border: 4px solid #1A0F0A; padding: 40px 30px; text-align: center; box-shadow: 12px 12px 0 #000; display: none; position: relative;}
+        
+        .astro-result-box { width: 100%; padding: 40px 30px; text-align: center; box-shadow: 12px 12px 0 #000; display: none; position: relative; border-radius: 8px;}
+        .astro-result-box.style-bamboo { background: #1a1a1a; border: 2px solid var(--amber); color: var(--amber); box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 8px 8px 0 #000; }
+        .astro-result-box.style-bamboo .astro-msg { color: var(--amber); text-shadow: 0 0 5px var(--amber-glow); font-family: var(--font-heading); }
+        .astro-result-box.style-card { background: #FFF8F0; border: 4px solid var(--amber); color: #1A0F0A; box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 8px 8px 0 #000; }
+        .astro-result-box.style-card .astro-msg { color: #1A0F0A; font-family: var(--font-body); }
+        
         .astro-result-box::before { content: '✧'; position: absolute; top: 10px; left: 10px; color: #DDAA33; font-size: 24px; }
         .astro-result-box::after { content: '✧'; position: absolute; bottom: 10px; right: 10px; color: #DDAA33; font-size: 24px; }
-        .astro-msg { font-family: var(--font-heading); font-size: 22px; color: #1A0F0A; font-weight: 900; line-height: 1.6; margin-bottom: 20px; }
+        .astro-msg { font-size: 20px; font-weight: 900; line-height: 1.6; margin-bottom: 20px; }
         .astro-coin-drop { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-kicker); font-weight: bold; font-size: 14px; color: #8B0000; background: rgba(221, 170, 51, 0.2); border: 1px dashed var(--amber); padding: 8px 15px; border-radius: 4px; animation: popIn 0.5s ease;}
         
         .anim-shake { animation: shake 0.5s ease-in-out 3; }
@@ -425,6 +431,7 @@
                     <div class="cat-eye right"></div>
                 </div>
             </div>
+            <!-- DOUBLE CLICK VÀO DÒNG CHỮ NÀY ĐỂ MỞ QUYỀN ADMIN -->
             <p class="kicker" id="secretAdminTrigger" title="Click đúp để mở lối vào ẩn của Trưởng ga">CHÀO MỪNG QUÝ KHÁCH ĐẾN VỚI</p>
             <h1 class="heading">NHÀ GA MEOWN</h1>
             <p class="body-text">Ở rìa của thực tại, nơi sương mù không bao giờ tan có một nhà ga nhỏ mang tên Meown. Đến với ga, quý khách không cần mua vé bằng tiền. Chỉ cần bạn bước lên chuyến tàu phù hợp, chọn một nhân viên và bắt đầu trò chuyện, con tàu sẽ tự động lăn bánh.</p>
@@ -439,7 +446,7 @@
             <button class="nav-item" data-view="trains">CÁC CHUYẾN TÀU</button>
             <button class="nav-item" data-view="guestbook">SỔ LƯU BÚT</button>
             <button class="nav-item" data-view="recruitment">TRẠM TUYỂN DỤNG</button>
-            <button class="nav-item" data-view="entertainment" style="border-color: var(--blood); color: var(--amber);">KHU GIẢI TRÍ ✧</button>
+            <button class="nav-item" data-view="entertainment" style="border-color: var(--amber); color: #000; background: var(--amber);">KHU GIẢI TRÍ ✧</button>
         </nav>
         <div class="content-area">
             <!-- PHÒNG TRƯỞNG GA -->
@@ -606,8 +613,8 @@
                     <button class="game-close" onclick="closeEntGame('astrolabe')">✕</button>
                     <div class="astro-container">
                         <div class="astro-btn-group" id="astroActions">
-                            <button class="astro-btn" onclick="playAstrolabe()">RÚT THẺ TRE 🎋</button>
-                            <button class="astro-btn" onclick="playAstrolabe()">RÚT BÀI ĐỊNH MỆNH 🌌</button>
+                            <button class="astro-btn" onclick="playAstrolabe('bamboo')">RÚT THẺ TRE 🎋</button>
+                            <button class="astro-btn" onclick="playAstrolabe('card')">RÚT BÀI ĐỊNH MỆNH 🌌</button>
                         </div>
                         
                         <div id="astroLottie" style="font-size: 60px; display:none;">✨⏳✨</div>
@@ -617,7 +624,7 @@
                             <div class="astro-coin-drop hidden" id="astroCoinDrop">
                                 Chúc mừng lữ khách nhận được 1 Đồng Xu May Mắn <div class="meown-coin-icon">M</div>
                             </div>
-                            <button class="submit-btn" style="margin-top: 20px; width:auto;" onclick="closeEntGame('astrolabe')">RỜI QUẦY 🚪</button>
+                            <button class="submit-btn" style="margin-top: 20px; width:auto; border-color: currentColor;" onclick="closeEntGame('astrolabe')">RỜI QUẦY 🚪</button>
                         </div>
                     </div>
                 </div>
@@ -1083,6 +1090,7 @@
                     
                     <details style="background:rgba(0,0,0,0.5); padding:15px; border:1px solid var(--amber); margin-bottom:15px; border-radius:4px;">
                         <summary style="color:var(--amber); font-family:var(--font-kicker); font-weight:bold; cursor:pointer;">🛠️ HỆ THỐNG PROMPT NHẬP VAI (AI THƯ TAY)</summary>
+                        <!-- Hệ thống API tự động sử dụng cấu trúc ở đây để gửi cho AI -->
                         <div class="form-row" style="margin-top:15px; display:flex; gap:10px;"><div style="flex:1;"><label>Xưng hô (Self)</label><input type="text" id="aPrSelf" value="${sData.promptParams.selfP}" placeholder="ta, tôi, anh..."></div><div style="flex:1;"><label>Gọi hành khách (Target)</label><input type="text" id="aPrTarget" value="${sData.promptParams.targetP}" placeholder="nàng, em, cậu..."></div></div>
                         <div class="form-row"><label>Tính cách & Bối cảnh</label><textarea id="aPrPers" style="height:60px;">${sData.promptParams.personality}</textarea></div>
                         <div class="form-row"><label>Khẩu khí & Ngôn ngữ</label><textarea id="aPrSpeech" style="height:60px;">${sData.promptParams.speech}</textarea></div>
@@ -1478,6 +1486,8 @@
             document.getElementById("mailBody").style.display = "none";
             document.getElementById("mailLoader").style.display = "block";
             
+            // AI Prompt System Simulation (Frontend Fallback for "The AI Prompt Injection")
+            // Normally this goes to a backend API. We simulate the AI's understanding of the Prompt Injection here.
             setTimeout(() => {
                 document.getElementById("mailLoader").style.display = "none";
                 const replyBox = document.getElementById("mailReply");
@@ -1487,8 +1497,10 @@
                 let selfP = p.selfP || "ta";
                 let targetP = p.targetP || "bạn";
                 let sig = p.signature || "Trân trọng.";
+                let tone = p.speech || "Ngắn gọn, tinh tế.";
                 
-                replyBox.innerHTML = `(Dấu ấn sáp đỏ của ${selectedStaff.name})<br><br>Đã nhận được thư của ${targetP}.<br>Ga Meown luôn dang rộng vòng tay đón ${targetP}. Mong ${targetP} luôn bình an.<br><br>---<br>${sig}`;
+                // MOCK API AI Response based on System Prompt Rules
+                replyBox.innerHTML = `(Dấu ấn sáp đỏ của ${selectedStaff.name})<br><br>Đã nhận được thư của ${targetP}.<br>Ga Meown luôn dang rộng vòng tay đón ${targetP}. Mong ${targetP} luôn bình an. ${tone ? '<br><i>(AI đã đọc cấu trúc văn phong: '+tone+')</i>' : ''}<br><br>---<br>${sig}`;
                 
                 document.getElementById("btnEndMail").classList.remove("hidden");
                 
@@ -1518,13 +1530,14 @@
         }
 
         // --- GAME 3: GIEO QUẺ ---
-        let fortunes = [
-            "Vũ trụ đang gửi đến bạn một cái ôm thật chặt. Mọi chuyện rồi sẽ ổn thôi.",
-            "Bạn đã làm rất tốt ngày hôm nay. Hãy nghỉ ngơi và thả lỏng nhé.",
-            "Những vì sao đang soi sáng con đường của bạn. Đừng bỏ cuộc.",
-            "Trái tim bạn là một viên ngọc quý. Hãy trân trọng chính mình.",
-            "Hôm nay là một ngày tuyệt vời để bạn tha thứ cho chính mình.",
-            "Một cánh cửa mới đang hé mở, hãy dũng cảm bước qua."
+        const fortuneBamboo = [
+            "Hữu duyên ngàn dặm, sân ga khói sương hôm nay đón bước chân người tĩnh lặng. Quẻ tre báo rằng: Vạn sự tùy duyên, hoa nở ắt có thời, muộn phiền ngày cũ xin hãy thả trôi theo dòng nước. Chúc lữ khách một ngày cát tường, thân tâm an lạc, vạn sự hanh thông.",
+            "Thế gian vội vã trăm ngả đường, nhưng nơi đây thời gian đã ngưng đọng để vỗ về lòng người. Săm tre hiện chữ 'Tự Tại': Đừng cưỡng cầu những điều đã mất, hãy trân trọng đóa hoa đang nở trong tay mình. Ga Meown chúc lữ khách một ngày gió lặng mây quang, lòng không gợn sóng."
+        ];
+        
+        const fortuneCard = [
+            "Thông điệp từ các tinh tú gửi đến tần số của bạn hôm nay: Những mệt mỏi bạn đang mang chỉ là một khoảng nghỉ ngắn trước khi ánh bình minh lộng lẫy nhất ló rạng. Vũ trụ đang sắp xếp mọi nguồn năng lượng lành tính nhất để ôm ấp và bảo bọc đứa con kiên cường của mình. Hãy hít một hơi thật sâu, ngày hôm nay mọi điều tuyệt vời đang dịu dàng tìm đến bạn.",
+            "Lá bài lấp lánh hào quang ngọc lam nhắc nhở bạn rằng trực giác của bạn chính là ngọn hải đăng rực rỡ nhất trong đêm tối. Đừng bao giờ nghi ngờ giá trị của bản thân, bởi vì sự tồn tại của bạn là một mảnh ghép độc bản và lấp lánh giữa dải ngân hà này. Hãy để năng lượng bình yên hôm nay ôm lấy bạn, bạn đã làm rất tốt rồi."
         ];
 
         function resetAstrolabe() {
@@ -1535,7 +1548,16 @@
             document.getElementById("astroLottie").classList.remove("anim-shake");
         }
 
-        window.playAstrolabe = function() {
+        window.playAstrolabe = function(type) {
+            // Check Rate Limit (24h)
+            if (!isAdminMode) {
+                let lastDraw = localStorage.getItem('last_draw_time');
+                if (lastDraw && Date.now() - parseInt(lastDraw) < 24 * 60 * 60 * 1000) {
+                    alert("Hôm nay lữ khách đã nhận được quà tặng từ định mệnh rồi. Chúc bạn một ngày bình yên và hẹn gặp lại vào ngày mai.");
+                    return;
+                }
+            }
+
             document.getElementById("astroActions").style.display = "none";
             const lottie = document.getElementById("astroLottie");
             lottie.style.display = "block";
@@ -1544,13 +1566,28 @@
             setTimeout(() => {
                 lottie.style.display = "none";
                 lottie.classList.remove("anim-shake");
+                
                 const resBox = document.getElementById("astroResult");
                 const msgText = document.getElementById("astroMsgText");
                 const coinDrop = document.getElementById("astroCoinDrop");
-                resBox.style.display = "block";
-                msgText.textContent = fortunes[Math.floor(Math.random() * fortunes.length)];
                 
-                if(Math.random() < 0.3) {
+                resBox.style.display = "block";
+                
+                // MOCK API GENERATION based on the provided Prompt Engineering specs
+                if (type === 'bamboo') {
+                    resBox.className = "astro-result-box style-bamboo";
+                    msgText.textContent = fortuneBamboo[Math.floor(Math.random() * fortuneBamboo.length)];
+                } else {
+                    resBox.className = "astro-result-box style-card";
+                    msgText.textContent = fortuneCard[Math.floor(Math.random() * fortuneCard.length)];
+                }
+                
+                if (!isAdminMode) {
+                    localStorage.setItem('last_draw_time', Date.now());
+                }
+
+                // 30% chance for Coin (or forced if Admin wants to test)
+                if(Math.random() < 0.3 || isAdminMode) {
                     coinDrop.classList.remove("hidden");
                     userMeownCoins++;
                     updateCoinDisplay();
